@@ -13,43 +13,59 @@ const stripe = new Stripe(stripeSecret, {
 
 const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
+// Helper function to create responses with CORS headers
+function corsResponse(body: string | object | null, status = 200) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, stripe-signature',
+    'Access-Control-Max-Age': '86400',
+  };
+
+  if (status === 204) {
+    return new Response(null, { status, headers });
+  }
+
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
 Deno.serve(async (req) => {
   try {
-    // Handle OPTIONS request for CORS preflight
+    // Handle CORS preflight requests
     if (req.method === 'OPTIONS') {
-      return new Response(null, { status: 204 });
+      return corsResponse(null, 204);
     }
 
     if (req.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 });
+      return corsResponse({ error: 'Method not allowed' }, 405);
     }
 
-    // get the signature from the header
     const signature = req.headers.get('stripe-signature');
-
     if (!signature) {
-      return new Response('No signature found', { status: 400 });
+      return corsResponse({ error: 'Missing stripe-signature header' }, 400);
     }
 
-    // get the raw body
     const body = await req.text();
-
-    // verify the webhook signature
     let event: Stripe.Event;
 
     try {
       event = await stripe.webhooks.constructEventAsync(body, signature, stripeWebhookSecret);
     } catch (error: any) {
       console.error(`Webhook signature verification failed: ${error.message}`);
-      return new Response(`Webhook signature verification failed: ${error.message}`, { status: 400 });
+      return corsResponse({ error: `Webhook signature verification failed: ${error.message}` }, 400);
     }
 
     EdgeRuntime.waitUntil(handleEvent(event));
-
-    return Response.json({ received: true });
+    return corsResponse({ received: true });
   } catch (error: any) {
     console.error('Error processing webhook:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return corsResponse({ error: error.message }, 500);
   }
 });
 
@@ -64,7 +80,6 @@ async function handleEvent(event: Stripe.Event) {
     return;
   }
 
-  // for one time payments, we only listen for the checkout.session.completed event
   if (event.type === 'payment_intent.succeeded' && event.data.object.invoice === null) {
     return;
   }
@@ -78,9 +93,7 @@ async function handleEvent(event: Stripe.Event) {
 
     if (event.type === 'checkout.session.completed') {
       const { mode } = stripeData as Stripe.Checkout.Session;
-
       isSubscription = mode === 'subscription';
-
       console.info(`Processing ${isSubscription ? 'subscription' : 'one-time payment'} checkout session`);
     }
 
@@ -91,7 +104,6 @@ async function handleEvent(event: Stripe.Event) {
       await syncCustomerFromStripe(customerId);
     } else if (mode === 'payment' && payment_status === 'paid') {
       try {
-        // Extract the necessary information from the session
         const {
           id: checkout_session_id,
           payment_intent,
@@ -100,7 +112,6 @@ async function handleEvent(event: Stripe.Event) {
           currency,
         } = stripeData as Stripe.Checkout.Session;
 
-        // Insert the order into the stripe_orders table
         const { error: orderError } = await supabase.from('stripe_orders').insert({
           checkout_session_id,
           payment_intent_id: payment_intent,
@@ -109,7 +120,7 @@ async function handleEvent(event: Stripe.Event) {
           amount_total,
           currency,
           payment_status,
-          status: 'completed', // assuming we want to mark it as completed since payment is successful
+          status: 'completed',
         });
 
         if (orderError) {
@@ -124,10 +135,8 @@ async function handleEvent(event: Stripe.Event) {
   }
 }
 
-// based on the excellent https://github.com/t3dotgg/stripe-recommendations
 async function syncCustomerFromStripe(customerId: string) {
   try {
-    // fetch latest subscription data from Stripe
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       limit: 1,
@@ -135,7 +144,6 @@ async function syncCustomerFromStripe(customerId: string) {
       expand: ['data.default_payment_method'],
     });
 
-    // TODO verify if needed
     if (subscriptions.data.length === 0) {
       console.info(`No active subscriptions found for customer: ${customerId}`);
       const { error: noSubError } = await supabase.from('stripe_subscriptions').upsert(
@@ -154,10 +162,8 @@ async function syncCustomerFromStripe(customerId: string) {
       }
     }
 
-    // assumes that a customer can only have a single subscription
     const subscription = subscriptions.data[0];
 
-    // store subscription state
     const { error: subError } = await supabase.from('stripe_subscriptions').upsert(
       {
         customer_id: customerId,
