@@ -12,3 +12,11 @@
   for = "/sw.js"
   [headers.values]
     Cache-Control = "max-age=0, no-cache, no-store, must-revalidate"
+
+# Add CORS headers for Supabase authentication
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept, Authorization"
