@@ -121,7 +121,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-1">
             <button
               onClick={onClose}
               className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl transition-colors duration-200 font-medium focus:outline-none text-base"
