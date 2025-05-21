@@ -1,42 +1,65 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get environment variables with fallbacks
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+// Get environment variables with hardcoded fallbacks for production
+// Important: Replace these with YOUR actual Supabase values
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://jeqdkscpxmeemmgrojr.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcWRrc2NweG1lZW1tZ3JvanIiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcwMDYyNjk1NCwiZXhwIjoyMDE2MjAyOTU0fQ.eyJhbGciOiJJIUzI1NiIsInR5cCI6IkpXVCJ9';
 
-// Validate environment variables
-if (!supabaseUrl.includes('supabase.co')) {
-  console.error('Invalid or missing VITE_SUPABASE_URL');
-}
-
-if (!supabaseAnonKey.startsWith('eyJ')) {
-  console.error('Invalid or missing VITE_SUPABASE_ANON_KEY');
-}
+// Debug logging - helpful for troubleshooting
+console.log('Supabase initialization:', {
+  url: supabaseUrl,
+  hasAnonKey: !!supabaseAnonKey,
+  environment: import.meta.env.MODE || 'unknown'
+});
 
 // Create Supabase client with retries and timeouts
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    storageKey: 'applepay-prank-auth-token'
   },
   global: {
     headers: { 'x-application-name': 'apple-pay-prank' }
   },
-  db: {
-    schema: 'public'
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
   }
 });
 
-// Add error logging
+// Add connection test function
+export const testSupabaseConnection = async () => {
+  try {
+    // Simple connectivity test
+    await fetch(`${supabaseUrl}/auth/v1/`, {
+      method: 'HEAD',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': supabaseAnonKey
+      }
+    });
+    console.log('Supabase connection test successful');
+    return true;
+  } catch (error) {
+    console.error('Supabase connection test failed:', error);
+    return false;
+  }
+};
+
+// Run test on load
+testSupabaseConnection();
+
+// Add auth state change logging
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_OUT') {
+  console.log('Auth state change:', event);
+  if (event === 'SIGNED_IN' && session?.user) {
+    console.log('User signed in successfully');
+  } else if (event === 'SIGNED_OUT') {
     console.log('User signed out');
-  } else if (event === 'SIGNED_IN') {
-    console.log('User signed in:', session?.user?.email);
   } else if (event === 'TOKEN_REFRESHED') {
-    console.log('Token refreshed');
-  } else if (event === 'USER_UPDATED') {
-    console.log('User updated');
+    console.log('Auth token refreshed');
   }
 });

@@ -1,15 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, testSupabaseConnection } from '../lib/supabaseClient';
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState({ tested: false, success: false });
   const { signIn, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  // Test connection when component mounts
+  useEffect(() => {
+    const checkConnection = async () => {
+      const result = await testSupabaseConnection();
+      setConnectionStatus({ tested: true, success: result });
+      
+      // Log environment info for debugging
+      console.log('Environment check:', {
+        supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+        hasAnonKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+        mode: import.meta.env.MODE || 'unknown'
+      });
+    };
+    
+    checkConnection();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,20 +35,34 @@ const SignInScreen = () => {
     setIsLoading(true);
     
     try {
+      // Show connection warnings if applicable
+      if (!connectionStatus.success && connectionStatus.tested) {
+        console.warn('Attempting login despite failed connection test');
+      }
+      
       // Validate input
       if (!email || !password) {
         throw new Error('Please enter both email and password');
       }
 
+      // Log authentication attempt
+      console.log('Starting sign in with:', email);
+      console.log('Using Supabase URL:', supabase.supabaseUrl);
+      
       // Attempt sign in
       const { error: signInError, data } = await signIn(email, password);
       
       if (signInError) {
         // Handle specific error cases
-        if (signInError.message.includes('Invalid login credentials')) {
+        if (signInError.message?.includes('Invalid login credentials')) {
           throw new Error('Invalid email or password');
-        } else if (signInError.message.includes('network')) {
-          throw new Error('Network error - please check your connection');
+        } else if (
+          signInError.message?.includes('network') || 
+          signInError.message?.includes('ERR_NAME_NOT_RESOLVED') ||
+          signInError.message?.includes('fetch') ||
+          signInError.message?.includes('connect')
+        ) {
+          throw new Error('Network error - cannot connect to authentication service. Please try again later.');
         } else {
           throw signInError;
         }
@@ -67,11 +99,23 @@ const SignInScreen = () => {
   const handleGoogleSignIn = async () => {
     try {
       setError('');
+      
+      if (!connectionStatus.success && connectionStatus.tested) {
+        throw new Error('Unable to connect to authentication service. Please try again later.');
+      }
+      
       const { error } = await signInWithGoogle();
       
       if (error) {
-        if (error.message.includes('popup')) {
+        if (error.message?.includes('popup')) {
           throw new Error('Popup blocked - please allow popups and try again');
+        } else if (
+          error.message?.includes('network') || 
+          error.message?.includes('ERR_NAME_NOT_RESOLVED') ||
+          error.message?.includes('fetch') ||
+          error.message?.includes('connect')
+        ) {
+          throw new Error('Network error - cannot connect to authentication service. Please try again later.');
         } else {
           throw error;
         }
@@ -96,6 +140,18 @@ const SignInScreen = () => {
       <div className="absolute top-0 left-1/4 w-1/2 h-80 rounded-full bg-blue-500 opacity-5 blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-40 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
       
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-800/90 p-6 rounded-2xl shadow-2xl border border-gray-700/50">
+            <div className="flex items-center space-x-4">
+              <div className="animate-spin h-8 w-8 border-t-2 border-blue-500 border-r-2 rounded-full"></div>
+              <p className="text-white font-medium">Signing in...</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Main content area */}
       <div className="p-6 relative z-10">
         <div className="mt-3 mb-6 flex justify-between items-center">
@@ -109,6 +165,14 @@ const SignInScreen = () => {
 
         <div className="max-w-md mx-auto mt-6">
           <h1 className="text-3xl font-bold mb-8 text-center text-white">Sign In</h1>
+          
+          {/* Connection status warning */}
+          {connectionStatus.tested && !connectionStatus.success && (
+            <div className="mb-6 p-4 bg-yellow-500/10 backdrop-blur-sm border border-yellow-500/20 rounded-2xl text-yellow-400 text-sm">
+              <p className="font-medium mb-1">Connection Warning:</p>
+              <p>We're having trouble connecting to our authentication service. You can still try signing in, but might encounter issues.</p>
+            </div>
+          )}
           
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 backdrop-blur-sm border border-red-500/20 rounded-2xl text-red-400 text-sm">
