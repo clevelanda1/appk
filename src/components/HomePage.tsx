@@ -303,6 +303,7 @@ const HomePage: React.FC = () => {
     <div 
       ref={containerRef}
       className="bg-gradient-to-b from-gray-900 to-black h-screen w-full overflow-hidden relative"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <MobileOnlyPopup mobileMaxWidth={768} />
       
