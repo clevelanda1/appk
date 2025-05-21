@@ -102,7 +102,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         <div className="w-32 h-1 bg-gray-600 rounded-full opacity-0"></div>
       </div>
 
-      <div className="px-6 pb-4">
+      <div className="px-6">
         <div className="text-center mb-2">
           <h2 className="text-white text-xl font-bold">Add to Home Screen</h2>
           <p className="text-gray-400 text-sm mt-1">Experience Apple Pay Prank at its best</p>
@@ -130,13 +130,13 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               Got It!
             </button>
             
-            <button
+            {/*<button
               onClick={onDismiss}
               className={`w-full ${buttonBgColor} text-white py-3.5 px-4 rounded-2xl font-medium focus:outline-none text-sm`}
               style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}
             >
               Do not show this again
-            </button>
+            </button>*/}
           </div>
         </div>
       </div>
