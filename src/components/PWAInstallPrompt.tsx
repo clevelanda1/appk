@@ -102,7 +102,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         <div className="w-32 h-1 bg-gray-600 rounded-full opacity-0"></div>
       </div>
 
-      <div className="px-6">
+      <div className="px-6 pb-1">
         <div className="text-center mb-2">
           <h2 className="text-white text-xl font-bold">Add to Home Screen</h2>
           <p className="text-gray-400 text-sm mt-1">Experience Apple Pay Prank at its best</p>
