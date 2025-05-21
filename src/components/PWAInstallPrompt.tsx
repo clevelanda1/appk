@@ -130,13 +130,13 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               Got It!
             </button>
             
-            <button
+            {/* <button
               onClick={onDismiss}
               className={`w-full ${buttonBgColor} text-white py-3.5 px-4 rounded-2xl font-medium focus:outline-none text-sm`}
               style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}
             >
-              Not Now
-            </button>
+              Do not show this again
+            </button>*/}
           </div>
         </div>
       </div>
