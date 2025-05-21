@@ -115,7 +115,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             </div>
             
             <div className="p-5">
-              <div className="bg-blue-500/10 rounded-lg p-4 mb-5">
+              <div className="bg-blue-500/10 rounded-lg p-4 mb-0">
                 {renderInstructions()}
               </div>
             </div>
