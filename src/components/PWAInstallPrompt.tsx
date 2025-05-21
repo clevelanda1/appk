@@ -115,17 +115,6 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             </div>
             
             <div className="p-5">
-              <div className="flex justify-center mb-4">
-                <div className="h-12 w-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              </div>
-              <p className="text-center text-gray-300 mb-5">
-                One-tap access from your home screen
-              </p>
-              
               <div className="bg-blue-500/10 rounded-lg p-4 mb-5">
                 {renderInstructions()}
               </div>
