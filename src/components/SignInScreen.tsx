@@ -72,7 +72,7 @@ const SignInScreen = () => {
       
       {/* Main content area */}
       <div className="p-6 relative z-10">
-        <div className="mt-3 mb-7 flex justify-between items-center">
+        <div className="mt-5 mb-7 flex justify-between items-center">
           <button
             onClick={() => navigate('/')}
             className="text-blue-500 font-medium text-lg focus:outline-none transition-colors duration-200"
@@ -173,7 +173,7 @@ const SignInScreen = () => {
       </div>
       
       {/* iOS-style home indicator */}
-      <div className="absolute bottom-8 w-full flex flex-col items-center space-y-3">
+      <div className="absolute bottom-2 w-full flex flex-col items-center space-y-3">
         <p className="text-gray-500 text-xs font-medium">Apple Pay Prank v1.0</p>
       </div>
     </div>
