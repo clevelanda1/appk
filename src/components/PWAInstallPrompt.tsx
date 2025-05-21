@@ -102,7 +102,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         <div className="w-32 h-1 bg-gray-600 rounded-full opacity-0"></div>
       </div>
 
-      <div className="px-6 pb-8">
+      <div className="px-6 pb-4">
         <div className="text-center mb-2">
           <h2 className="text-white text-xl font-bold">Add to Home Screen</h2>
           <p className="text-gray-400 text-sm mt-1">Experience Apple Pay Prank at its best</p>
@@ -121,7 +121,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-3">
             <button
               onClick={onClose}
               className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl transition-colors duration-200 font-medium focus:outline-none text-base"
