@@ -98,6 +98,10 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         zIndex: 50,
       }}
     >
+      <div className="w-full flex justify-center py-3">
+        <div className="w-32 h-1 bg-gray-600 rounded-full opacity-0"></div>
+      </div>
+
       <div className="px-6 pb-8">
         <div className="text-center mb-2">
           <h2 className="text-white text-xl font-bold">Add to Home Screen</h2>
