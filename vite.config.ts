@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
-        name: 'APK Bank',
-        short_name: 'APKBank',
-        description: 'Your application description',
+        name: 'Apple Pay Prank',
+        short_name: 'Apple Pay Prank',
+        description: 'Create convincing Apple Pay notifications to share with yourfriends & family',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',
