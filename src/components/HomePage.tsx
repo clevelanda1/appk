@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import BankCardCycler from './BankCardCycler';
 import MobileOnlyPopup from './MobileOnlyPopup';
 import AuthCardStack from './AuthCardStack';
+import PWAInstallPrompt from './PWAInstallPrompt';
 
 const HomePage: React.FC = () => {
   const [isCardStackVisible, setIsCardStackVisible] = useState(false);
@@ -14,6 +15,7 @@ const HomePage: React.FC = () => {
   const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
   const [isThemeChanging, setIsThemeChanging] = useState(false);
   const [randomCardNumbers, setRandomCardNumbers] = useState('4852');
+  const [isPWAPromptVisible, setIsPWAPromptVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -164,6 +166,42 @@ const HomePage: React.FC = () => {
     }
   }, [user]);
   
+  // Check if PWA prompt should be shown (on initial load)
+  useEffect(() => {
+    // Always show the prompt initially for testing
+    const timer = setTimeout(() => {
+      console.log('Setting PWA prompt visible');
+      setIsPWAPromptVisible(true);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+    
+    // Comment out the code below during testing
+    /*
+    const hasSeenPWAPrompt = localStorage.getItem('hasSeenPWAPrompt') === 'true';
+    
+    // Check if the user is on a mobile device
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent || navigator.vendor
+    );
+    
+    // Only show the prompt if:
+    // 1. It hasn't been dismissed before
+    // 2. User is on a mobile device
+    // 3. The app is not already installed as PWA
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    
+    if (!hasSeenPWAPrompt && isMobileDevice && !isStandalone) {
+      // Show the prompt after a short delay to allow page to load
+      const timer = setTimeout(() => {
+        setIsPWAPromptVisible(true);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
+    */
+  }, []);
+  
   const handleGetStarted = () => {
     navigate('/signin');
   };
@@ -206,6 +244,16 @@ const HomePage: React.FC = () => {
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+  
+  const handleClosePWAPrompt = () => {
+    setIsPWAPromptVisible(false);
+  };
+  
+  const handleDismissPWAPrompt = () => {
+    // Save to localStorage so the prompt doesn't show again
+    localStorage.setItem('hasSeenPWAPrompt', 'true');
+    setIsPWAPromptVisible(false);
   };
   
   const calculateShinePosition = () => {
@@ -431,6 +479,13 @@ const HomePage: React.FC = () => {
         onClose={() => setIsCardStackVisible(false)}
         onSignIn={handleSignIn}
         onSignUp={handleSignUp}
+      />
+      
+      {/* PWA Installation Prompt */}
+      <PWAInstallPrompt
+        isVisible={isPWAPromptVisible}
+        onClose={handleClosePWAPrompt}
+        onDismiss={handleDismissPWAPrompt}
       />
     </div>
   );
