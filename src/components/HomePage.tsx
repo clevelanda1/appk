@@ -316,12 +316,11 @@ const HomePage: React.FC = () => {
     // Make sure the container fills the full screen including the status bar
     <div 
       ref={containerRef}
-      className="bg-gradient-to-b from-gray-900 to-black h-screen w-full overflow-hidden relative"
+      className="bg-gradient-to-b from-gray-900 to-black w-full overflow-hidden relative safe-area-container"
       style={{
-        minHeight: '100vh',
-        /* The following ensures content is positioned correctly with status bar */
-        paddingTop: 'constant(safe-area-inset-top)', /* iOS 11.0 */
-        paddingTop: 'env(safe-area-inset-top)' /* iOS 11.2+ */
+        // These styles ensure the container extends to all edges including bottom
+        minHeight: '100vh', 
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       <MobileOnlyPopup mobileMaxWidth={768} />
