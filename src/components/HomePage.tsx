@@ -168,16 +168,17 @@ const HomePage: React.FC = () => {
   
   // Check if PWA prompt should be shown (on initial load)
   useEffect(() => {
-    // Always show the prompt initially for testing
-    const timer = setTimeout(() => {
-      console.log('Setting PWA prompt visible');
-      setIsPWAPromptVisible(true);
-    }, 1500);
+    // Check if the app is already running in standalone mode (installed as PWA)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone || // For iOS
+                        document.referrer.includes('android-app://');
     
-    return () => clearTimeout(timer);
+    // If already installed as PWA, don't show the prompt
+    if (isStandalone) {
+      console.log('App is running as installed PWA, not showing prompt');
+      return;
+    }
     
-    // Comment out the code below during testing
-    /*
     const hasSeenPWAPrompt = localStorage.getItem('hasSeenPWAPrompt') === 'true';
     
     // Check if the user is on a mobile device
@@ -189,17 +190,15 @@ const HomePage: React.FC = () => {
     // 1. It hasn't been dismissed before
     // 2. User is on a mobile device
     // 3. The app is not already installed as PWA
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    
     if (!hasSeenPWAPrompt && isMobileDevice && !isStandalone) {
       // Show the prompt after a short delay to allow page to load
       const timer = setTimeout(() => {
+        console.log('Setting PWA prompt visible');
         setIsPWAPromptVisible(true);
       }, 1500);
       
       return () => clearTimeout(timer);
     }
-    */
   }, []);
   
   const handleGetStarted = () => {

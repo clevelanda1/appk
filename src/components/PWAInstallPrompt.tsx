@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 interface PWAInstallPromptProps {
@@ -32,11 +31,9 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   }, []);
   
   // In production, uncomment this to only show on mobile
-  /*
   if (!isMobile) {
     return null;
   }
-  */
   
   const renderInstructions = () => {
     if (platform === 'ios') {
@@ -107,8 +104,8 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 
       <div className="px-6 pb-8">
         <div className="text-center mb-2">
-          <h2 className="text-white text-xl font-bold">Install App</h2>
-          <p className="text-gray-400 text-sm mt-1">Install as an app for a better experience</p>
+          <h2 className="text-white text-xl font-bold">Add to Home Screen</h2>
+          <p className="text-gray-400 text-sm mt-1">Experience Apple Pay Prank at its best</p>
         </div>
 
         <div className="py-5">
@@ -119,8 +116,16 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             
             <div className="p-5">
               <div className="flex justify-center mb-4">
-    
+                <div className="h-12 w-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
               </div>
+              <p className="text-center text-gray-300 mb-5">
+                One-tap access from your home screen
+              </p>
+              
               <div className="bg-blue-500/10 rounded-lg p-4 mb-5">
                 {renderInstructions()}
               </div>
@@ -133,7 +138,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl transition-colors duration-200 font-medium focus:outline-none text-base"
               style={{ boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)' }}
             >
-              Got it!
+              Let's Do It!
             </button>
             
             <button
@@ -141,7 +146,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               className={`w-full ${buttonBgColor} text-white py-3.5 px-4 rounded-2xl font-medium focus:outline-none text-sm`}
               style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}
             >
-              Don't show again
+              Not Now
             </button>
           </div>
         </div>
