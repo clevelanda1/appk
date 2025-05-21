@@ -127,7 +127,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl transition-colors duration-200 font-medium focus:outline-none text-base"
               style={{ boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)' }}
             >
-              Let's Do It!
+              Got It!
             </button>
             
             <button
