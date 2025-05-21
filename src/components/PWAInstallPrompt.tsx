@@ -99,7 +99,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
       }}
     >
       <div className="w-full flex justify-center py-3">
-        <div className="w-32 h-1 bg-gray-600 rounded-full opacity-30"></div>
+        <div className="w-32 h-1 bg-gray-600 rounded-full opacity-0"></div>
       </div>
 
       <div className="px-6 pb-8">
@@ -115,17 +115,6 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             </div>
             
             <div className="p-5">
-              <div className="flex justify-center mb-4">
-                <div className="h-12 w-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              </div>
-              <p className="text-center text-gray-300 mb-5">
-                One-tap access from your home screen
-              </p>
-              
               <div className="bg-blue-500/10 rounded-lg p-4 mb-5">
                 {renderInstructions()}
               </div>
@@ -138,7 +127,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl transition-colors duration-200 font-medium focus:outline-none text-base"
               style={{ boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)' }}
             >
-              Let's Do It!
+              Got It!
             </button>
             
             <button
@@ -146,7 +135,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               className={`w-full ${buttonBgColor} text-white py-3.5 px-4 rounded-2xl font-medium focus:outline-none text-sm`}
               style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}
             >
-              Not Now
+              Do not show this again
             </button>
           </div>
         </div>
