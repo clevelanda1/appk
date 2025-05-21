@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
@@ -207,10 +208,27 @@ const HomePage: React.FC = () => {
     document.documentElement.classList.add('dark-theme');
     document.body.classList.add('dark-theme');
     
+    // Handle iOS viewport height issues
+    const setAppHeight = () => {
+      // First we get the viewport height and we multiply it by 1% to get a value for a vh unit
+      const vh = window.innerHeight * 0.01;
+      // Then we set the value in the --vh custom property to the root of the document
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    
+    // Set the initial height
+    setAppHeight();
+    
+    // Listen to window resize events
+    window.addEventListener('resize', setAppHeight);
+    window.addEventListener('orientationchange', setAppHeight);
+    
     return () => {
       // Clean up when component unmounts
       document.documentElement.classList.remove('dark-theme');
       document.body.classList.remove('dark-theme');
+      window.removeEventListener('resize', setAppHeight);
+      window.removeEventListener('orientationchange', setAppHeight);
     };
   }, []);
   
@@ -306,21 +324,25 @@ const HomePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-b from-gray-900 to-black h-screen w-full flex items-center justify-center">
+      <div className="bg-gradient-to-b from-gray-900 to-black fixed inset-0 flex items-center justify-center">
         <div className="text-white text-lg">Loading...</div>
       </div>
     );
   }
   
   return (
-    // Make sure the container fills the full screen including the status bar
+    // Fixed positioning with inset-0 ensures full viewport coverage
     <div 
       ref={containerRef}
-      className="bg-gradient-to-b from-gray-900 to-black w-full overflow-hidden relative safe-area-container"
+      className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black overflow-hidden"
       style={{
-        // These styles ensure the container extends to all edges including bottom
-        minHeight: '100vh', 
-        paddingBottom: 'env(safe-area-inset-bottom)',
+        // Use custom viewport height variables for iOS/mobile
+        height: 'calc(var(--vh, 1vh) * 100)',
+        // Apply padding for top and bottom safe areas
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        paddingLeft: 'env(safe-area-inset-left, 0px)',
+        paddingRight: 'env(safe-area-inset-right, 0px)',
       }}
     >
       <MobileOnlyPopup mobileMaxWidth={768} />

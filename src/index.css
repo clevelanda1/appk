@@ -2,10 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Critical CSS to extend background to status bar area AND bottom home indicator */
+/* Full viewport extension solution */
 @layer base {
   :root {
     color-scheme: dark;
+    --app-height: 100%;
+  }
+  
+  /* Critical viewport height fix for mobile browsers */
+  @supports (-webkit-touch-callout: none) {
+    body, html {
+      height: -webkit-fill-available;
+    }
+    #root {
+      height: -webkit-fill-available;
+    }
+    .safe-area-container {
+      min-height: -webkit-fill-available;
+    }
   }
   
   html, body {
@@ -14,50 +28,50 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    background-color: #121418;
+    background-image: linear-gradient(to bottom, #121418, #000000);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     touch-action: manipulation;
-    background-color: #121418; /* Dark background */
-    background-image: linear-gradient(to bottom, #121418, #000000); /* Match your gradient */
-  }
-  
-  /* This class is added by HomePage component */
-  .dark-theme {
-    background-color: #121418;
-    background-image: linear-gradient(to bottom, #121418, #000000);
+    position: fixed;
   }
   
   #root {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
     height: 100%;
-    width: 100%;
     overflow: hidden;
+    background-color: transparent;
   }
-
-  /* Full-height container with proper padding for safe areas */
+  
+  /* This element stretches to the full viewport including all safe areas */
   .safe-area-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     min-height: 100vh;
+    min-height: 100dvh; /* Modern viewport height that accounts for browser UI */
     width: 100%;
-    /* Add padding for the safe areas at top and bottom */
-    padding-top: env(safe-area-inset-top, 0);
-    padding-bottom: env(safe-area-inset-bottom, 0);
-    /* Ensure content is padded for side safe areas too */
-    padding-left: env(safe-area-inset-left, 0);
-    padding-right: env(safe-area-inset-right, 0);
-    /* Ensure the container fills the entire viewport */
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    background-color: transparent;
+    /* Only add padding for content that shouldn't be in safe areas */
+    overflow: hidden;
+  }
+  
+  .content-container {
+    flex: 1;
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
   }
 }
 
