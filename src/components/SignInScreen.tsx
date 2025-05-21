@@ -17,42 +17,68 @@ const SignInScreen = () => {
     setIsLoading(true);
     
     try {
-      const { error, data } = await signIn(email, password);
-      
-      if (error) {
-        setError(error.message);
-        return;
+      // Validate input
+      if (!email || !password) {
+        throw new Error('Please enter both email and password');
       }
 
-      // If sign in was successful, navigate to dashboard or pricing based on premium status
-      if (data?.user) {
-        // Check if user has completed a payment
-        const { data: orders } = await supabase
-          .from('stripe_orders')
-          .select('status')
-          .eq('status', 'completed')
-          .not('payment_status', 'eq', 'unpaid')
-          .maybeSingle();
-
-        if (orders) {
-          navigate('/dashboard');
+      // Attempt sign in
+      const { error: signInError, data } = await signIn(email, password);
+      
+      if (signInError) {
+        // Handle specific error cases
+        if (signInError.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password');
+        } else if (signInError.message.includes('network')) {
+          throw new Error('Network error - please check your connection');
         } else {
+          throw signInError;
+        }
+      }
+
+      // Check premium status and redirect
+      if (data?.user) {
+        try {
+          const { data: orders, error: ordersError } = await supabase
+            .from('stripe_orders')
+            .select('status')
+            .eq('status', 'completed')
+            .not('payment_status', 'eq', 'unpaid')
+            .maybeSingle();
+
+          if (ordersError) throw ordersError;
+
+          // Redirect based on premium status
+          navigate(orders ? '/dashboard' : '/pricing');
+        } catch (err) {
+          console.error('Error checking premium status:', err);
+          // Default to pricing page if status check fails
           navigate('/pricing');
         }
       }
     } catch (err) {
-      setError('An unexpected error occurred');
       console.error('Sign in error:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setError('');
-    const { error } = await signInWithGoogle();
-    if (error) {
-      setError(error.message);
+    try {
+      setError('');
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        if (error.message.includes('popup')) {
+          throw new Error('Popup blocked - please allow popups and try again');
+        } else {
+          throw error;
+        }
+      }
+    } catch (err) {
+      console.error('Google sign in error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
     }
   };
 
@@ -72,7 +98,7 @@ const SignInScreen = () => {
       
       {/* Main content area */}
       <div className="p-6 relative z-10">
-        <div className="mt-5 mb-7 flex justify-between items-center">
+        <div className="mt-3 mb-6 flex justify-between items-center">
           <button
             onClick={() => navigate('/')}
             className="text-blue-500 font-medium text-lg focus:outline-none transition-colors duration-200"
@@ -173,11 +199,14 @@ const SignInScreen = () => {
       </div>
       
       {/* iOS-style home indicator */}
-      <div className="absolute bottom-4 w-full flex flex-col items-center space-y-3">
+      <div className="absolute bottom-8 w-full flex flex-col items-center space-y-3">
         <p className="text-gray-500 text-xs font-medium">Apple Pay Prank v1.0</p>
+        <div className="w-32 h-1 bg-white/20 rounded-full"></div>
       </div>
     </div>
   );
 };
 
 export default SignInScreen;
+
+export default SignInScreen
