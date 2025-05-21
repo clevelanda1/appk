@@ -489,13 +489,13 @@ const HomePage: React.FC = () => {
         </>
       )}
       
-      <div className="absolute bottom-2 w-full flex flex-col items-center space-y-3" 
+      {/*<div className="absolute bottom-2 w-full flex flex-col items-center space-y-3" 
           style={{ 
             marginBottom: 'env(safe-area-inset-bottom, 0px)',
             paddingBottom: '0px' // Add extra padding at the bottom
           }}>
         <p className="text-gray-500 text-xs font-medium">Apple Pay Prank v1.0</p>
-      </div>
+        </div>*/}
       
       <style jsx>{`
         @keyframes shineEffect {
