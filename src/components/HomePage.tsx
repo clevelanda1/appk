@@ -343,6 +343,11 @@ const HomePage: React.FC = () => {
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
         paddingRight: 'env(safe-area-inset-right, 0px)',
+        // Additional styles to ensure full coverage
+        margin: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
       }}
     >
       <MobileOnlyPopup mobileMaxWidth={768} />
@@ -484,7 +489,11 @@ const HomePage: React.FC = () => {
         </>
       )}
       
-      <div className="absolute bottom-8 w-full flex flex-col items-center space-y-3">
+      <div className="absolute bottom-8 w-full flex flex-col items-center space-y-3" 
+          style={{ 
+            marginBottom: 'env(safe-area-inset-bottom, 0px)',
+            paddingBottom: '16px' // Add extra padding at the bottom
+          }}>
         <p className="text-gray-500 text-xs font-medium">Apple Pay Prank v1.0</p>
       </div>
       
@@ -510,6 +519,18 @@ const HomePage: React.FC = () => {
           0% { opacity: 0; }
           50% { opacity: 0.3; }
           100% { opacity: 0; }
+        }
+        
+        /* Add this to fix bottom area on iOS */
+        .fixed {
+          position: fixed !important;
+        }
+        
+        /* Ensure full height for all elements */
+        html, body, #root {
+          height: 100% !important;
+          overflow: hidden !important;
+          background-color: #000 !important;
         }
       `}</style>
       
