@@ -201,6 +201,19 @@ const HomePage: React.FC = () => {
     }
   }, []);
   
+  // Add this effect to ensure that the body background matches your app's background
+  useEffect(() => {
+    // Apply background color and gradient to document body
+    document.documentElement.classList.add('dark-theme');
+    document.body.classList.add('dark-theme');
+    
+    return () => {
+      // Clean up when component unmounts
+      document.documentElement.classList.remove('dark-theme');
+      document.body.classList.remove('dark-theme');
+    };
+  }, []);
+  
   const handleGetStarted = () => {
     navigate('/signin');
   };
@@ -300,10 +313,16 @@ const HomePage: React.FC = () => {
   }
   
   return (
+    // Make sure the container fills the full screen including the status bar
     <div 
       ref={containerRef}
       className="bg-gradient-to-b from-gray-900 to-black h-screen w-full overflow-hidden relative"
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      style={{
+        minHeight: '100vh',
+        /* The following ensures content is positioned correctly with status bar */
+        paddingTop: 'constant(safe-area-inset-top)', /* iOS 11.0 */
+        paddingTop: 'env(safe-area-inset-top)' /* iOS 11.2+ */
+      }}
     >
       <MobileOnlyPopup mobileMaxWidth={768} />
       
