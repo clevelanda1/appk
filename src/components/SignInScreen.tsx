@@ -264,7 +264,7 @@ const SignInScreen = () => {
       </div>
       
       {/* iOS-style home indicator */}
-      <div className="absolute bottom-8 w-full flex flex-col items-center space-y-3">
+      <div className="absolute bottom-6 w-full flex flex-col items-center space-y-3">
         <p className="text-gray-500 text-xs font-medium">Apple Pay Prank v1.0</p>
       </div>
     </div>
