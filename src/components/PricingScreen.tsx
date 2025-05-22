@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStripe } from '../hooks/useStripe';
+import { useAuth } from '../hooks/useAuth';
 import { STRIPE_PRODUCTS } from '../stripe-config';
 
 interface PricingScreenProps {
@@ -11,11 +12,33 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
   const navigate = useNavigate();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { loading, error, purchaseLifetimeAccess } = useStripe();
+  const { signOut } = useAuth();
 
   const handleUpgrade = async () => {
     setIsTransitioning(true);
     await purchaseLifetimeAccess();
     setIsTransitioning(false);
+  };
+
+  const handleDone = async () => {
+    setIsTransitioning(true);
+    
+    try {
+      // Sign out the user
+      const { error } = await signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+      }
+      
+      // Navigate to home page
+      navigate('/');
+    } catch (error) {
+      console.error('Error during sign out:', error);
+      // Still navigate to home even if sign out fails
+      navigate('/');
+    } finally {
+      setIsTransitioning(false);
+    }
   };
 
   return (
@@ -38,10 +61,11 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
       <div className="p-6 relative z-10">
         <div className="mt-3 mb-6 flex justify-between items-center">
           <button
-            onClick={() => navigate('/')}
-            className="text-blue-500 font-medium text-lg focus:outline-none transition-colors duration-200"
+            onClick={handleDone}
+            disabled={isTransitioning}
+            className="text-blue-500 font-medium text-lg focus:outline-none transition-colors duration-200 disabled:opacity-50"
           >
-            Done
+            {isTransitioning ? 'Processing...' : 'Done'}
           </button>
         </div>
 
@@ -67,7 +91,7 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
                   <p className="text-gray-400 text-sm mt-1">All features included</p>
                 </div>
                 <div className="flex flex-col items-end">
-                  <div className="text-white font-bold text-2xl">$5.99</div>
+                  <div className="text-white font-bold text-2xl">$7.99</div>
                   <div className="text-gray-400 text-xs">One-time Payment</div>
                 </div>
               </div>
@@ -133,7 +157,7 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
 
               <button
                 onClick={handleUpgrade}
-                disabled={loading}
+                disabled={loading || isTransitioning}
                 className="relative w-full py-3.5 text-base font-medium focus:outline-none active:opacity-90 transition-all duration-200 rounded-xl text-white mt-4 disabled:opacity-50"
                 style={{
                   background: 'linear-gradient(to right, #0A84FF, #0070E0)',

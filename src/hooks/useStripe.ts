@@ -11,14 +11,32 @@ export function useStripe() {
       setLoading(true);
       setError(null);
 
+      // Debug logging
+      console.log('Environment check:', {
+        supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+        hasAnonKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+        priceId: priceId,
+        mode: mode
+      });
+
       // Get the current session
       const { data: { session } } = await supabase.auth.getSession();
+      
+      console.log('Session check:', {
+        hasSession: !!session,
+        hasAccessToken: !!session?.access_token,
+        hasUser: !!session?.user,
+        userId: session?.user?.id
+      });
       
       if (!session?.access_token) {
         throw new Error('Please sign in to continue with checkout');
       }
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`, {
+      const requestUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-checkout`;
+      console.log('Making request to:', requestUrl);
+
+      const response = await fetch(requestUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,12 +50,18 @@ export function useStripe() {
         }),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Error response:', errorData);
         throw new Error(errorData.error || 'Failed to create checkout session');
       }
 
       const { url } = await response.json();
+      console.log('Checkout URL received:', url);
+      
       if (!url) throw new Error('No checkout URL received');
 
       window.location.href = url;
