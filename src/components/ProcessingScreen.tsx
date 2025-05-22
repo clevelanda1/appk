@@ -47,7 +47,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
     // Play the sound shortly before changing state
     const soundTimer = setTimeout(() => {
       // Play Apple Pay success sound
-      const audio = new Audio('../sounds/applePayChime.mp4');
+      const audio = new Audio('../public/applePayChime.mp4');
       audio.play().catch(e => console.log('Audio playback error:', e));
     }, soundDelay);
     
