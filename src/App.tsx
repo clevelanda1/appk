@@ -7,57 +7,39 @@ import SignUpScreen from './components/SignUpScreen';
 import PricingScreen from './components/PricingScreen';
 import { useAuth } from './hooks/useAuth';
 
-// Simple Loading Screen
-const LoadingScreen = () => (
-  <div className="bg-gradient-to-b from-gray-900 to-black fixed inset-0 flex items-center justify-center"
-       style={{
-         height: 'calc(var(--vh, 1vh) * 100)',
-         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
-       }}>
-    <div className="flex flex-col items-center space-y-4">
-      <div className="relative">
-        <div className="w-16 h-16 border-4 border-blue-500/30 rounded-full"></div>
-        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-        
-        <div 
-          className="absolute -inset-2 rounded-full opacity-30 blur-xl" 
-          style={{ 
-            background: 'radial-gradient(circle, rgba(10, 132, 255, 0.6) 0%, rgba(10, 132, 255, 0) 70%)'
-          }}
-        ></div>
-      </div>
-      
-      <div className="text-center">
-        <p className="text-white text-lg font-medium">Loading...</p>
-        <p className="text-gray-400 text-sm mt-1">Checking authentication</p>
-      </div>
-    </div>
-  </div>
-);
-
 function App() {
-  const { user, loading, isPremium, sessionChecked } = useAuth();
+  const { user, loading, isPremium } = useAuth();
   
-  // iOS viewport fixes
+  // Apply full viewport coverage for iOS devices
   useEffect(() => {
+    // Handle iOS viewport height issues
     const setAppHeight = () => {
+      // First we get the viewport height and we multiply it by 1% to get a value for a vh unit
       const vh = window.innerHeight * 0.01;
+      // Then we set the value in the --vh custom property to the root of the document
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
     
+    // Set the initial height
     setAppHeight();
     
+    // Listen to window resize events
     window.addEventListener('resize', setAppHeight);
     window.addEventListener('orientationchange', setAppHeight);
     
+    // Ensure body and html take full height
     document.documentElement.style.height = '100%';
     document.body.style.height = '100%';
     document.body.style.margin = '0';
     document.body.style.overflow = 'hidden';
+    
+    // Apply styles for safe areas
     document.body.style.paddingBottom = 'env(safe-area-inset-bottom, 0px)';
     document.body.style.paddingTop = 'env(safe-area-inset-top, 0px)';
     document.body.style.paddingLeft = 'env(safe-area-inset-left, 0px)';
     document.body.style.paddingRight = 'env(safe-area-inset-right, 0px)';
+    
+    // Apply background color to body
     document.body.style.backgroundColor = '#000000';
     
     return () => {
@@ -66,20 +48,34 @@ function App() {
     };
   }, []);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('🎯 App state:', {
-      user: user?.email || 'none',
-      isPremium,
-      loading,
-      sessionChecked,
-      currentPath: window.location.pathname
-    });
-  }, [user, isPremium, loading, sessionChecked]);
-  
-  // Show loading screen until auth is checked
-  if (loading || !sessionChecked) {
-    return <LoadingScreen />;
+  // ONLY show loading when auth is truly loading (prevents flash)
+  if (loading) {
+    return (
+      <div className="bg-gradient-to-b from-gray-900 to-black fixed inset-0 flex items-center justify-center"
+           style={{
+             height: 'calc(var(--vh, 1vh) * 100)',
+             paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+           }}>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-blue-500/30 rounded-full"></div>
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+            
+            <div 
+              className="absolute -inset-2 rounded-full opacity-30 blur-xl" 
+              style={{ 
+                background: 'radial-gradient(circle, rgba(10, 132, 255, 0.6) 0%, rgba(10, 132, 255, 0) 70%)'
+              }}
+            ></div>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-white text-lg font-medium">Loading...</p>
+            <p className="text-gray-400 text-sm mt-1">Checking authentication</p>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   return (
@@ -96,16 +92,19 @@ function App() {
         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
       }}>
         <Routes>
-          {/* Public route */}
+          {/* Public routes */}
           <Route path="/" element={<HomePage />} />
           
-          {/* Auth routes */}
+          {/* Auth routes - redirect authenticated users */}
           <Route 
             path="/signin" 
             element={
               user ? (
-                // User is logged in, redirect based on premium status
-                <Navigate to={isPremium ? "/dashboard" : "/pricing"} replace />
+                isPremium ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Navigate to="/pricing" replace />
+                )
               ) : (
                 <SignInScreen />
               )
@@ -116,56 +115,61 @@ function App() {
             path="/signup" 
             element={
               user ? (
-                <Navigate to={isPremium ? "/dashboard" : "/pricing"} replace />
+                isPremium ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Navigate to="/pricing" replace />
+                )
               ) : (
                 <SignUpScreen />
               )
             } 
           />
           
-          {/* Pricing page - only for authenticated users */}
+          {/* Protected routes */}
           <Route 
             path="/pricing" 
             element={
-              !user ? (
-                // Not logged in, go to sign in
-                <Navigate to="/signin" replace />
-              ) : isPremium ? (
-                // Already premium, go to dashboard
-                <Navigate to="/dashboard" replace />
+              user ? (
+                isPremium ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <PricingScreen />
+                )
               ) : (
-                // Perfect - show pricing
-                <PricingScreen />
+                <Navigate to="/signin" replace />
               )
             } 
           />
           
-          {/* Dashboard - only for premium users */}
           <Route 
             path="/dashboard" 
             element={
-              !user ? (
-                // Not logged in
-                <Navigate to="/signin" replace />
-              ) : !isPremium ? (
-                // Not premium
-                <Navigate to="/pricing" replace />
+              user ? (
+                isPremium ? (
+                  <Dashboard isPremium={isPremium} />
+                ) : (
+                  <Navigate to="/pricing" replace />
+                )
               ) : (
-                // Perfect - show dashboard
-                <Dashboard isPremium={isPremium} />
+                <Navigate to="/signin" replace />
               )
             } 
           />
           
-          {/* Catch all */}
+          {/* Catch all - redirect based on auth state */}
           <Route 
             path="*" 
             element={
-              <Navigate to={
-                user ? 
-                  (isPremium ? "/dashboard" : "/pricing") : 
-                  "/"
-              } replace />
+              user ? (
+                isPremium ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Navigate to="/pricing" replace />
+                )
+              ) : (
+                <Navigate to="/" replace />
+              )
             } 
           />
         </Routes>
