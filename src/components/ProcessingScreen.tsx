@@ -17,6 +17,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
 }) => {
   const [dots, setDots] = useState('.');
   const [processingStage, setProcessingStage] = useState<'processing' | 'confirmed'>('processing');
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const navigate = useNavigate();
   
   // Format currency with commas for thousands
@@ -26,6 +27,31 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
       maximumFractionDigits: 2
     });
   };
+  
+  // Initialize audio context on first user interaction
+  useEffect(() => {
+    const initAudioContext = () => {
+      if (!audioContext) {
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        setAudioContext(ctx);
+      }
+    };
+
+    // Listen for any user interaction to initialize audio
+    const handleUserInteraction = () => {
+      initAudioContext();
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction);
+    document.addEventListener('click', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, [audioContext]);
   
   // Handle dots animation
   useEffect(() => {
@@ -42,13 +68,16 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   // Handle the processing stages - transitions to confirmed then navigates
   useEffect(() => {
     const processingDuration = 2000; // Total time in processing state (2 seconds)
-    const soundDelay = processingDuration - 0; // Play sound 700ms before state change
+    const soundDelay = processingDuration - 0; // Play sound at the same time
     
     // Play the sound shortly before changing state
-    const soundTimer = setTimeout(() => {
-      // Play Apple Pay success sound
-      const audio = new Audio('/applePayChime.mp4');
-      audio.play().catch(e => console.log('Audio playback error:', e));
+    const soundTimer = setTimeout(async () => {
+      try {
+        // Multiple approaches to play audio
+        await playAudioMultipleWays();
+      } catch (error) {
+        console.error('All audio methods failed:', error);
+      }
     }, soundDelay);
     
     // Change to confirmed after processingDuration
@@ -72,6 +101,77 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
       clearTimeout(confirmedTimer);
     };
   }, [onComplete, navigate, redirectTo]);
+
+  // Multiple methods to play audio
+  const playAudioMultipleWays = async () => {
+    const audioUrls = [
+      '/applePayChime.mp4',
+      './applePayChime.mp4',
+      `${window.location.origin}/applePayChime.mp4`
+    ];
+
+    // Method 1: Standard HTML Audio
+    for (const url of audioUrls) {
+      try {
+        const audio = new Audio(url);
+        audio.volume = 0.8;
+        
+        // Resume audio context if needed
+        if (audioContext && audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+        
+        await audio.play();
+        console.log(`Audio played successfully with URL: ${url}`);
+        return; // Exit if successful
+      } catch (error) {
+        console.log(`Failed to play audio with URL ${url}:`, error);
+      }
+    }
+
+    // Method 2: Web Audio API (fallback)
+    try {
+      if (audioContext) {
+        await playWithWebAudioAPI();
+        return;
+      }
+    } catch (error) {
+      console.log('Web Audio API failed:', error);
+    }
+
+    // Method 3: Create audio element and append to DOM
+    try {
+      const audio = document.createElement('audio');
+      audio.src = '/applePayChime.mp4';
+      audio.volume = 0.8;
+      document.body.appendChild(audio);
+      
+      await audio.play();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(audio);
+      }, 1000);
+      
+      console.log('Audio played via DOM method');
+    } catch (error) {
+      console.log('DOM audio method failed:', error);
+    }
+  };
+
+  // Web Audio API method
+  const playWithWebAudioAPI = async () => {
+    if (!audioContext) return;
+    
+    const response = await fetch('/applePayChime.mp4');
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioContext.destination);
+    source.start();
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white w-full">
@@ -154,11 +254,6 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
           {processingStage === 'confirmed' && 'Your payment has been received'}
         </p>
       </div>
-      
-      {/* iOS-style home indicator */}
-      {/*<div className="absolute bottom-8 w-full flex flex-col items-center space-y-3">
-        <p className="text-gray-50/10 text-xs font-medium">Apple Pay Prank v1.0</p>
-          </div>*/}
     </div>
   );
 };
