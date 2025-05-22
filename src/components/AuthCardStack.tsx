@@ -38,7 +38,7 @@ const AuthCardStack: React.FC<AuthCardStackProps> = ({
         <div className="w-32 h-1 bg-gray-600 rounded-full opacity-30"></div>
       </div>
 
-      <div className="px-6 pb-6">
+      <div className="px-6 pb-2">
         <div className="flex justify-center py-5 mb-1">
           <button 
             onClick={onSignUp}
