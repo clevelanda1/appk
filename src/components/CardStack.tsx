@@ -255,7 +255,7 @@ const CardStack: React.FC<CardStackProps> = ({
         <div className="w-32 h-1 bg-gray-600 rounded-full opacity-30"></div>
       </div>
 
-      <div className="px-6 pb-8">
+      <div className="px-6 pb-12">
         {showSignOutConfirm ? (
           <div className="pt-4 pb-2">
             <div className="flex flex-col items-center justify-center py-6">
@@ -476,7 +476,7 @@ const CardStack: React.FC<CardStackProps> = ({
               )}
             </div>
             
-            <div className="space-y-8">
+            <div className="space-y-3">
               <button
                 onClick={onClose}
                 className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl font-medium focus:outline-none transition-colors duration-200"
