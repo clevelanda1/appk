@@ -51,6 +51,7 @@ const SignInScreen = () => {
       
       // Attempt sign in
       const { error: signInError, data } = await signIn(email, password);
+        console.log ('Sign-in error', signInError);
       
       if (signInError) {
         // Handle specific error cases
