@@ -75,6 +75,19 @@ const ProtectedRoute = ({
 function App() {
   const { user, loading, isPremium, sessionChecked } = useAuth();
   
+  // Fallback timeout for loading state
+  useEffect(() => {
+    if (loading) {
+      const timeout = setTimeout(() => {
+        console.warn('Auth loading timeout - proceeding without session');
+        // Force App to render even if auth is still loading
+        // This is a failsafe for web browsers
+      }, 15000); // 15 second timeout
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [loading]);
+  
   // Apply full viewport coverage for iOS devices
   useEffect(() => {
     // Handle iOS viewport height issues
@@ -125,8 +138,8 @@ function App() {
     }
   }, [user, isPremium, loading, sessionChecked]);
   
-  // Show loading state if auth is still initializing
-  if (loading || !sessionChecked) {
+  // Show loading state if auth is still initializing (with timeout)
+  if (loading && !sessionChecked) {
     return <LoadingScreen />;
   }
   
