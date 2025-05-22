@@ -390,7 +390,7 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
       `}</style>
 
       <div className="flex-1 flex flex-col z-10">
-        <div className="px-5 py-8 flex justify-between items-center">
+        <div className="px-5 pt-12 pb-4 flex justify-between items-center">
           <button 
             onClick={onSendRequest}
             className="text-blue-500 font-medium text-lg"
