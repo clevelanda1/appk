@@ -276,7 +276,7 @@ const CardScreen: React.FC<CardScreenProps> = ({
       <div className="absolute top-0 left-1/4 w-1/2 h-80 rounded-full bg-blue-500 opacity-5 blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
       
-      <div className="flex justify-center items-center mt-10 px-6">
+      <div className="flex justify-center items-center mt-14 px-6">
         <div 
           ref={cardRef}
           onClick={handleCardClick}
