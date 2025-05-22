@@ -468,7 +468,7 @@ const HomePage: React.FC = () => {
             </div>
           </div>
           
-          <div className="absolute bottom-36 w-full flex justify-center px-6">
+          <div className="absolute bottom-36 w-full flex flex-col items-center px-6">
             <button 
               onClick={handleGetStarted}
               className="group relative w-48 text-white py-3.5 text-base font-medium focus:outline-none active:opacity-90 transition-all duration-200 rounded-full overflow-hidden"
