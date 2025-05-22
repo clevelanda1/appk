@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import Dashboard from './components/Dashboard';
@@ -7,7 +7,7 @@ import SignUpScreen from './components/SignUpScreen';
 import PricingScreen from './components/PricingScreen';
 import { useAuth } from './hooks/useAuth';
 
-// Loading Screen Component
+// Simple Loading Screen
 const LoadingScreen = () => (
   <div className="bg-gradient-to-b from-gray-900 to-black fixed inset-0 flex items-center justify-center"
        style={{
@@ -15,12 +15,10 @@ const LoadingScreen = () => (
          paddingBottom: 'env(safe-area-inset-bottom, 0px)'
        }}>
     <div className="flex flex-col items-center space-y-4">
-      {/* Animated Apple Pay style loading */}
       <div className="relative">
         <div className="w-16 h-16 border-4 border-blue-500/30 rounded-full"></div>
         <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
         
-        {/* Subtle glow effect */}
         <div 
           className="absolute -inset-2 rounded-full opacity-30 blur-xl" 
           style={{ 
@@ -37,86 +35,29 @@ const LoadingScreen = () => (
   </div>
 );
 
-// Protected Route Component
-const ProtectedRoute = ({ 
-  children, 
-  requireAuth = true, 
-  requirePremium = false 
-}: { 
-  children: React.ReactNode;
-  requireAuth?: boolean;
-  requirePremium?: boolean;
-}) => {
-  const { user, loading, isPremium, sessionChecked } = useAuth();
-
-  // CRITICAL: Show loading until we KNOW the auth state
-  if (loading || !sessionChecked) {
-    return <LoadingScreen />;
-  }
-
-  // Now we can safely evaluate auth requirements
-  if (requireAuth && !user) {
-    return <Navigate to="/signin" replace />;
-  }
-
-  if (requirePremium && user && !isPremium) {
-    return <Navigate to="/pricing" replace />;
-  }
-
-  // Redirect premium users away from pricing
-  if (user && isPremium && window.location.pathname === '/pricing') {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children}</>;
-};
-
 function App() {
   const { user, loading, isPremium, sessionChecked } = useAuth();
-  const [emergencyMode, setEmergencyMode] = useState(false);
   
-  // EMERGENCY: Force app to load after 7 seconds if still loading
+  // iOS viewport fixes
   useEffect(() => {
-    const emergencyTimeout = setTimeout(() => {
-      if (loading || !sessionChecked) {
-        console.error('EMERGENCY MODE: Auth stuck, forcing app load');
-        setEmergencyMode(true);
-      }
-    }, 7000);
-
-    return () => clearTimeout(emergencyTimeout);
-  }, [loading, sessionChecked]);
-
-  // Apply full viewport coverage for iOS devices
-  useEffect(() => {
-    // Handle iOS viewport height issues
     const setAppHeight = () => {
-      // First we get the viewport height and we multiply it by 1% to get a value for a vh unit
       const vh = window.innerHeight * 0.01;
-      // Then we set the value in the --vh custom property to the root of the document
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
     
-    // Set the initial height
     setAppHeight();
     
-    // Listen to window resize events
     window.addEventListener('resize', setAppHeight);
     window.addEventListener('orientationchange', setAppHeight);
     
-    // Ensure body and html take full height
     document.documentElement.style.height = '100%';
     document.body.style.height = '100%';
     document.body.style.margin = '0';
     document.body.style.overflow = 'hidden';
-    
-    // Apply styles for safe areas
     document.body.style.paddingBottom = 'env(safe-area-inset-bottom, 0px)';
     document.body.style.paddingTop = 'env(safe-area-inset-top, 0px)';
     document.body.style.paddingLeft = 'env(safe-area-inset-left, 0px)';
     document.body.style.paddingRight = 'env(safe-area-inset-right, 0px)';
-    
-    // Apply background color to body
     document.body.style.backgroundColor = '#000000';
     
     return () => {
@@ -125,21 +66,19 @@ function App() {
     };
   }, []);
 
-  // Debug logging for auth state
+  // Debug logging
   useEffect(() => {
-    if (sessionChecked || emergencyMode) {
-      console.log('App render state:', {
-        user: user?.email || 'not logged in',
-        isPremium,
-        loading,
-        sessionChecked,
-        emergencyMode
-      });
-    }
-  }, [user, isPremium, loading, sessionChecked, emergencyMode]);
+    console.log('🎯 App state:', {
+      user: user?.email || 'none',
+      isPremium,
+      loading,
+      sessionChecked,
+      currentPath: window.location.pathname
+    });
+  }, [user, isPremium, loading, sessionChecked]);
   
-  // CRITICAL: Don't render routes until auth state is confirmed OR emergency mode
-  if ((loading || !sessionChecked) && !emergencyMode) {
+  // Show loading screen until auth is checked
+  if (loading || !sessionChecked) {
     return <LoadingScreen />;
   }
   
@@ -156,27 +95,17 @@ function App() {
         backgroundColor: '#000',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
       }}>
-        {/* Emergency mode warning */}
-        {emergencyMode && (
-          <div className="fixed top-4 left-4 bg-red-500 text-white px-3 py-1 rounded text-xs z-50">
-            Emergency Mode: Auth timeout
-          </div>
-        )}
-        
         <Routes>
-          {/* Public routes */}
+          {/* Public route */}
           <Route path="/" element={<HomePage />} />
           
-          {/* Auth routes - redirect authenticated users */}
+          {/* Auth routes */}
           <Route 
             path="/signin" 
             element={
-              (user && !emergencyMode) ? (
-                isPremium ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <Navigate to="/pricing" replace />
-                )
+              user ? (
+                // User is logged in, redirect based on premium status
+                <Navigate to={isPremium ? "/dashboard" : "/pricing"} replace />
               ) : (
                 <SignInScreen />
               )
@@ -186,58 +115,57 @@ function App() {
           <Route 
             path="/signup" 
             element={
-              (user && !emergencyMode) ? (
-                isPremium ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <Navigate to="/pricing" replace />
-                )
+              user ? (
+                <Navigate to={isPremium ? "/dashboard" : "/pricing"} replace />
               ) : (
                 <SignUpScreen />
               )
             } 
           />
           
-          {/* Protected routes using ProtectedRoute wrapper */}
+          {/* Pricing page - only for authenticated users */}
           <Route 
             path="/pricing" 
             element={
-              emergencyMode ? (
-                <PricingScreen />
+              !user ? (
+                // Not logged in, go to sign in
+                <Navigate to="/signin" replace />
+              ) : isPremium ? (
+                // Already premium, go to dashboard
+                <Navigate to="/dashboard" replace />
               ) : (
-                <ProtectedRoute requireAuth={true}>
-                  <PricingScreen />
-                </ProtectedRoute>
+                // Perfect - show pricing
+                <PricingScreen />
               )
             } 
           />
           
+          {/* Dashboard - only for premium users */}
           <Route 
             path="/dashboard" 
             element={
-              emergencyMode ? (
-                <Dashboard isPremium={false} />
+              !user ? (
+                // Not logged in
+                <Navigate to="/signin" replace />
+              ) : !isPremium ? (
+                // Not premium
+                <Navigate to="/pricing" replace />
               ) : (
-                <ProtectedRoute requireAuth={true} requirePremium={true}>
-                  <Dashboard isPremium={isPremium} />
-                </ProtectedRoute>
+                // Perfect - show dashboard
+                <Dashboard isPremium={isPremium} />
               )
             } 
           />
           
-          {/* Catch all - redirect based on auth state */}
+          {/* Catch all */}
           <Route 
             path="*" 
             element={
-              (user && !emergencyMode) ? (
-                isPremium ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <Navigate to="/pricing" replace />
-                )
-              ) : (
-                <Navigate to="/" replace />
-              )
+              <Navigate to={
+                user ? 
+                  (isPremium ? "/dashboard" : "/pricing") : 
+                  "/"
+              } replace />
             } 
           />
         </Routes>
