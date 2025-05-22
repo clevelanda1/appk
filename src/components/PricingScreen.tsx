@@ -21,55 +21,34 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
   };
 
   const handleDone = async () => {
-    setIsTransitioning(true);
+    console.log('Done clicked - signing out...');
     
     try {
-      // Sign out the user
-      const { error } = await signOut();
-      if (error) {
-        console.error('Error signing out:', error);
-      }
-      
-      // Navigate to home page
-      navigate('/');
+      await signOut();
+      console.log('Signed out successfully');
     } catch (error) {
-      console.error('Error during sign out:', error);
-      // Still navigate to home even if sign out fails
-      navigate('/');
-    } finally {
-      setIsTransitioning(false);
+      console.error('Sign out error:', error);
     }
+    
+    navigate('/');
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-gray-900 to-black text-white transition-opacity duration-300 ${
-      isTransitioning ? 'opacity-0' : 'opacity-100'
-    }`}>
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="w-full h-full" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: '60px 60px'
-        }}></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      {/* Remove all background decorative elements that might be blocking clicks */}
       
-      {/* Ambient light effects */}
-      <div className="absolute top-0 left-1/4 w-1/2 h-80 rounded-full bg-blue-500 opacity-5 blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-40 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
-      
-      {/* Main content area */}
-      <div className="p-6 relative z-10">
-        <div className="mt-3 mb-6 flex justify-between items-center">
+      {/* Simple header with working button */}
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
           <button
             onClick={handleDone}
-            disabled={isTransitioning}
-            className="text-blue-500 font-medium text-lg focus:outline-none transition-colors duration-200 disabled:opacity-50"
+            className="text-blue-500 font-medium text-lg hover:text-blue-400 focus:outline-none"
           >
-            {isTransitioning ? 'Processing...' : 'Done'}
+            Done
           </button>
         </div>
 
-        <div className="max-w-md mx-auto mt-6">
+        <div className="max-w-md mx-auto">
           <h1 className="text-3xl font-bold mb-2 text-center">Unlock All Features</h1>
           <p className="text-gray-400 text-center mb-8">One-time payment to access premium features</p>
 
@@ -157,7 +136,7 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
 
               <button
                 onClick={handleUpgrade}
-                disabled={loading || isTransitioning}
+                disabled={loading}
                 className="relative w-full py-3.5 text-base font-medium focus:outline-none active:opacity-90 transition-all duration-200 rounded-xl text-white mt-4 disabled:opacity-50"
                 style={{
                   background: 'linear-gradient(to right, #0A84FF, #0070E0)',
