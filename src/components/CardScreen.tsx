@@ -429,7 +429,7 @@ const CardScreen: React.FC<CardScreenProps> = ({
           >
             {/* Shimmer effect overlay */}
             <div className="shimmer-overlay absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
-              <div className="shimmer-light absolute top-0 -left-full h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
+              <div className="shimmer-light absolute top-0 -left-full h-full w-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"></div>
             </div>
             
             <div className="absolute inset-0 w-full h-full pointer-events-none opacity-30"
@@ -437,7 +437,7 @@ const CardScreen: React.FC<CardScreenProps> = ({
                    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%)'
                  }}></div>
             
-            <span className="relative z-10 text-white/60 transition-colors duration-300 flex items-center justify-center group-hover:text-white/90">
+            <span className="relative z-10 text-white/60 transition-colors duration-300 flex items-center justify-center">
               <Apple className="w-5 h-5 mr-2 opacity-80" />
               Request
             </span>
@@ -488,19 +488,14 @@ const CardScreen: React.FC<CardScreenProps> = ({
           animation: breathe 3s ease-in-out infinite;
         }
         
-        .request-button:hover {
-          animation: none;
-          transform: scale(1.05);
-          box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.1);
+        .request-button .shimmer-light {
+          animation: shimmer 2s ease-in-out infinite;
+          animation-delay: 1s;
         }
         
         .request-button:active {
           transform: scale(0.98);
           transition: transform 0.1s ease;
-        }
-        
-        .request-button:hover .shimmer-light {
-          animation: shimmer 1.5s ease-in-out;
         }
         
         .shimmer-overlay {
