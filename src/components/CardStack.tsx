@@ -476,7 +476,7 @@ const CardStack: React.FC<CardStackProps> = ({
               )}
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-8">
               <button
                 onClick={onClose}
                 className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl font-medium focus:outline-none transition-colors duration-200"
