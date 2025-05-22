@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Get environment variables with hardcoded fallbacks for production
 // Important: Replace these with YOUR actual Supabase values
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://jeqdkscpxmeemmgrojr.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcWRrc2NweG1lZW1tZ3JvanIiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcwMDYyNjk1NCwiZXhwIjoyMDE2MjAyOTU0fQ.eyJhbGciOiJJIUzI1NiIsInR5cCI6IkpXVCJ9';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ieqdkscpxmeemmgrrojr.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllcWRrc2NweG1lZW1tZ3Jyb2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0Njk1MjIsImV4cCI6MjA2MzA0NTUyMn0.RwM1EqZ0sPRdKQsSnNRw9m9HTtaXNuL4z6xs9Fs6Png';
 
 // Debug logging - helpful for troubleshooting
 console.log('Supabase initialization:', {
