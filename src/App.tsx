@@ -7,8 +7,73 @@ import SignUpScreen from './components/SignUpScreen';
 import PricingScreen from './components/PricingScreen';
 import { useAuth } from './hooks/useAuth';
 
+// Loading Screen Component
+const LoadingScreen = () => (
+  <div className="bg-gradient-to-b from-gray-900 to-black fixed inset-0 flex items-center justify-center"
+       style={{
+         height: 'calc(var(--vh, 1vh) * 100)',
+         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+       }}>
+    <div className="flex flex-col items-center space-y-4">
+      {/* Animated Apple Pay style loading */}
+      <div className="relative">
+        <div className="w-16 h-16 border-4 border-blue-500/30 rounded-full"></div>
+        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+        
+        {/* Subtle glow effect */}
+        <div 
+          className="absolute -inset-2 rounded-full opacity-30 blur-xl" 
+          style={{ 
+            background: 'radial-gradient(circle, rgba(10, 132, 255, 0.6) 0%, rgba(10, 132, 255, 0) 70%)'
+          }}
+        ></div>
+      </div>
+      
+      <div className="text-center">
+        <p className="text-white text-lg font-medium">Loading...</p>
+        <p className="text-gray-400 text-sm mt-1">Checking authentication</p>
+      </div>
+    </div>
+  </div>
+);
+
+// Protected Route Component
+const ProtectedRoute = ({ 
+  children, 
+  requireAuth = true, 
+  requirePremium = false 
+}: { 
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requirePremium?: boolean;
+}) => {
+  const { user, loading, isPremium, sessionChecked } = useAuth();
+
+  // Show loading while checking authentication
+  if (loading || !sessionChecked) {
+    return <LoadingScreen />;
+  }
+
+  // Redirect to sign in if auth is required but user is not authenticated
+  if (requireAuth && !user) {
+    return <Navigate to="/signin" replace />;
+  }
+
+  // Redirect to pricing if premium is required but user is not premium
+  if (requirePremium && user && !isPremium) {
+    return <Navigate to="/pricing" replace />;
+  }
+
+  // Redirect premium users away from pricing
+  if (user && isPremium && window.location.pathname === '/pricing') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
-  const { user, loading, isPremium } = useAuth();
+  const { user, loading, isPremium, sessionChecked } = useAuth();
   
   // Apply full viewport coverage for iOS devices
   useEffect(() => {
@@ -47,18 +112,22 @@ function App() {
       window.removeEventListener('orientationchange', setAppHeight);
     };
   }, []);
+
+  // Debug logging for auth state
+  useEffect(() => {
+    if (sessionChecked) {
+      console.log('Auth state:', {
+        user: user?.email || 'not logged in',
+        isPremium,
+        loading,
+        sessionChecked
+      });
+    }
+  }, [user, isPremium, loading, sessionChecked]);
   
   // Show loading state if auth is still initializing
-  if (loading) {
-    return (
-      <div className="bg-gradient-to-b from-gray-900 to-black fixed inset-0 flex items-center justify-center"
-           style={{
-             height: 'calc(var(--vh, 1vh) * 100)',
-             paddingBottom: 'env(safe-area-inset-bottom, 0px)'
-           }}>
-        <div className="text-white text-lg">Loading...</div>
-      </div>
-    );
+  if (loading || !sessionChecked) {
+    return <LoadingScreen />;
   }
   
   return (
@@ -75,34 +144,75 @@ function App() {
         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
       }}>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/signin" element={<SignInScreen />} />
-          <Route path="/signup" element={<SignUpScreen />} />
+          
+          {/* Auth routes - redirect authenticated users */}
           <Route 
-            path="/pricing" 
+            path="/signin" 
             element={
               user ? (
                 isPremium ? (
                   <Navigate to="/dashboard" replace />
                 ) : (
-                  <PricingScreen />
+                  <Navigate to="/pricing" replace />
                 )
               ) : (
-                <Navigate to="/signin" replace />
+                <SignInScreen />
               )
             } 
           />
+          
           <Route 
-            path="/dashboard" 
+            path="/signup" 
             element={
               user ? (
                 isPremium ? (
-                  <Dashboard isPremium={isPremium} />
+                  <Navigate to="/dashboard" replace />
                 ) : (
                   <Navigate to="/pricing" replace />
                 )
               ) : (
-                <Navigate to="/signin" replace />
+                <SignUpScreen />
+              )
+            } 
+          />
+          
+          {/* Protected routes */}
+          <Route 
+            path="/pricing" 
+            element={
+              <ProtectedRoute requireAuth={true}>
+                {isPremium ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <PricingScreen />
+                )}
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute requireAuth={true} requirePremium={true}>
+                <Dashboard isPremium={isPremium} />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Catch all - redirect based on auth state */}
+          <Route 
+            path="*" 
+            element={
+              user ? (
+                isPremium ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <Navigate to="/pricing" replace />
+                )
+              ) : (
+                <Navigate to="/" replace />
               )
             } 
           />
