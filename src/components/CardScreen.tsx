@@ -441,8 +441,8 @@ const CardScreen: React.FC<CardScreenProps> = ({
       )}
       
       <div className="absolute bottom-14 w-full text-center flex flex-col items-center space-y-2">
-        <p className="text-gray-400/40 text-xs font-medium">Swipe up to edit request </p>
-        <p className="text-gray-500/40 mb-[10px] text-xs font-medium">Tap card to change design & hold to save</p>
+        <p className="text-gray-400/30 text-xs font-medium">Swipe up to edit request </p>
+        <p className="text-gray-500/30 mb-[10px] text-xs font-medium">Tap card to change design & hold to save</p>
       </div>
       
       <style jsx>{`
