@@ -418,7 +418,7 @@ const CardScreen: React.FC<CardScreenProps> = ({
         <div className="absolute bottom-36 w-full flex flex-col items-center px-6">
           <button 
             onClick={onPayButtonPress}
-            className="group relative w-48 text-white/50 py-3.5 text-base font-medium tracking-tight focus:outline-none active:opacity-90 transition-all duration-200 rounded-full overflow-hidden"
+            className="request-button group relative w-48 text-white/50 py-3.5 text-base font-medium tracking-tight focus:outline-none transition-all duration-300 rounded-full overflow-hidden"
             style={{
               background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
               backdropFilter: 'blur(10px)',
@@ -427,12 +427,17 @@ const CardScreen: React.FC<CardScreenProps> = ({
               border: '0.5px solid rgba(255, 255, 255, 0.05)',
             }}
           >
+            {/* Shimmer effect overlay */}
+            <div className="shimmer-overlay absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
+              <div className="shimmer-light absolute top-0 -left-full h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
+            </div>
+            
             <div className="absolute inset-0 w-full h-full pointer-events-none opacity-30"
                  style={{
                    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 100%)'
                  }}></div>
             
-            <span className="relative z-10 text-white/60 hover:text-white/80 transition-colors duration-300 flex items-center justify-center">
+            <span className="relative z-10 text-white/60 transition-colors duration-300 flex items-center justify-center group-hover:text-white/90">
               <Apple className="w-5 h-5 mr-2 opacity-80" />
               Request
             </span>
@@ -461,6 +466,45 @@ const CardScreen: React.FC<CardScreenProps> = ({
         @keyframes lockPulse {
           0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
           100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+        
+        @keyframes breathe {
+          0%, 100% { 
+            transform: scale(1); 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.05);
+          }
+          50% { 
+            transform: scale(1.02); 
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.05);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%) skewX(12deg); }
+          100% { transform: translateX(200%) skewX(12deg); }
+        }
+        
+        .request-button {
+          animation: breathe 3s ease-in-out infinite;
+        }
+        
+        .request-button:hover {
+          animation: none;
+          transform: scale(1.05);
+          box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.1);
+        }
+        
+        .request-button:active {
+          transform: scale(0.98);
+          transition: transform 0.1s ease;
+        }
+        
+        .request-button:hover .shimmer-light {
+          animation: shimmer 1.5s ease-in-out;
+        }
+        
+        .shimmer-overlay {
+          border-radius: inherit;
         }
       `}</style>
       
