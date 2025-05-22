@@ -15,24 +15,35 @@ export function useAuth() {
   useEffect(() => {
     let mounted = true;
     let initTimeout: NodeJS.Timeout;
+    let forceCompleteTimeout: NodeJS.Timeout;
+
+    console.log('useAuth: Starting initialization...');
+
+    // CRITICAL: Force complete after 5 seconds no matter what
+    forceCompleteTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('FORCE COMPLETING AUTH - preventing infinite loop');
+        setLoading(false);
+        setSessionChecked(true);
+        // Don't change user state here - let it be whatever it is
+      }
+    }, 5000); // Reduced to 5 seconds
 
     const initializeAuth = async () => {
       try {
-        console.log('Initializing auth...');
+        console.log('useAuth: Getting session...');
         
-        // Add timeout protection
+        // Much shorter timeout - 3 seconds max
         const timeoutPromise = new Promise((_, reject) => {
           initTimeout = setTimeout(() => {
-            reject(new Error('Auth initialization timeout'));
-          }, 8000); // 8 second timeout
+            reject(new Error('Session check timeout after 3s'));
+          }, 3000);
         });
 
         const sessionPromise = supabase.auth.getSession();
         
-        // Race between session check and timeout
         const result = await Promise.race([sessionPromise, timeoutPromise]);
         
-        // Clear timeout if we got here
         if (initTimeout) clearTimeout(initTimeout);
         
         const { data: { session }, error } = result as any;
@@ -40,103 +51,66 @@ export function useAuth() {
         if (!mounted) return;
 
         if (error) {
-          console.warn('Session check error (non-fatal):', error.message);
-          // Don't block - just proceed without session
+          console.warn('Session error:', error.message);
           setUser(null);
           setIsPremium(false);
         } else if (session?.user) {
-          console.log('Existing session found:', session.user.email);
+          console.log('Found session for:', session.user.email);
           setUser(session.user);
           
-          // Check premium status in background (non-blocking)
-          checkPremiumStatus(session.user.id).catch(err => {
-            console.warn('Premium check failed (non-fatal):', err);
-            setIsPremium(false);
-          });
-          
-          localStorage.setItem('lastLoginCheck', new Date().toISOString());
+          // Premium check in background - don't await
+          checkPremiumStatus(session.user.id);
         } else {
-          console.log('No existing session');
+          console.log('No session found');
           setUser(null);
           setIsPremium(false);
         }
         
       } catch (error) {
-        console.warn('Auth initialization failed (non-fatal):', error);
+        console.warn('Auth init failed:', error);
         if (mounted) {
           setUser(null);
           setIsPremium(false);
         }
       } finally {
         if (mounted) {
-          console.log('Auth initialization complete');
+          console.log('useAuth: Initialization complete');
           setLoading(false);
           setSessionChecked(true);
         }
-        if (initTimeout) clearTimeout(initTimeout);
       }
     };
 
-    // Force completion after 10 seconds regardless
-    const forceComplete = setTimeout(() => {
-      if (mounted && (loading || !sessionChecked)) {
-        console.warn('Force completing auth initialization due to timeout');
-        setLoading(false);
-        setSessionChecked(true);
-        setUser(null);
-        setIsPremium(false);
-      }
-    }, 10000);
-
-    // Initialize auth
+    // Start initialization
     initializeAuth();
 
-    // Listen for auth state changes (simplified)
+    // Simplified auth listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+      
       console.log('Auth event:', event);
       
-      if (!mounted) return;
-
-      // Ensure loading states are cleared
+      // Always ensure loading is false after any auth event
       setLoading(false);
       setSessionChecked(true);
 
       switch (event) {
         case 'SIGNED_IN':
           if (session?.user) {
-            console.log('User signed in:', session.user.email);
             setUser(session.user);
-            localStorage.setItem('lastLoginTime', new Date().toISOString());
-            
-            // Check premium status (non-blocking)
-            checkPremiumStatus(session.user.id).catch(err => {
-              console.warn('Premium check on sign in failed:', err);
-              setIsPremium(false);
-            });
+            checkPremiumStatus(session.user.id);
           }
           break;
           
         case 'SIGNED_OUT':
-          console.log('User signed out');
           setUser(null);
           setIsPremium(false);
-          localStorage.removeItem('lastLoginTime');
-          localStorage.removeItem('lastLoginCheck');
-          break;
-          
-        case 'TOKEN_REFRESHED':
-          console.log('Token refreshed');
-          if (session?.user) {
-            setUser(session.user);
-            checkPremiumStatus(session.user.id).catch(console.warn);
-          }
           break;
           
         default:
-          // Handle any other auth events
           setUser(session?.user ?? null);
           if (session?.user) {
-            checkPremiumStatus(session.user.id).catch(console.warn);
+            checkPremiumStatus(session.user.id);
           } else {
             setIsPremium(false);
           }
@@ -147,7 +121,7 @@ export function useAuth() {
       mounted = false;
       subscription.unsubscribe();
       if (initTimeout) clearTimeout(initTimeout);
-      clearTimeout(forceComplete);
+      if (forceCompleteTimeout) clearTimeout(forceCompleteTimeout);
     };
   }, []);
 
@@ -192,18 +166,18 @@ export function useAuth() {
     try {
       console.log('Checking premium status...');
       
-      // Add timeout to premium check
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Premium check timeout')), 5000);
-      });
+      // Short timeout for premium check
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      const queryPromise = supabase
+      const { data: orders, error } = await supabase
         .from('stripe_orders')
         .select('status')
         .eq('status', 'completed')
-        .not('payment_status', 'eq', 'unpaid');
+        .not('payment_status', 'eq', 'unpaid')
+        .abortSignal(controller.signal);
 
-      const { data: orders, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      clearTimeout(timeoutId);
 
       if (error) throw error;
 
@@ -212,7 +186,11 @@ export function useAuth() {
       console.log('Premium status:', premium);
       
     } catch (error) {
-      console.warn('Premium status check failed:', error);
+      if (error.name === 'AbortError') {
+        console.warn('Premium check timed out');
+      } else {
+        console.warn('Premium check failed:', error);
+      }
       setIsPremium(false);
     }
   };

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import Dashboard from './components/Dashboard';
@@ -73,7 +73,20 @@ const ProtectedRoute = ({
 
 function App() {
   const { user, loading, isPremium, sessionChecked } = useAuth();
+  const [emergencyMode, setEmergencyMode] = useState(false);
   
+  // EMERGENCY: Force app to load after 7 seconds if still loading
+  useEffect(() => {
+    const emergencyTimeout = setTimeout(() => {
+      if (loading || !sessionChecked) {
+        console.error('EMERGENCY MODE: Auth stuck, forcing app load');
+        setEmergencyMode(true);
+      }
+    }, 7000);
+
+    return () => clearTimeout(emergencyTimeout);
+  }, [loading, sessionChecked]);
+
   // Apply full viewport coverage for iOS devices
   useEffect(() => {
     // Handle iOS viewport height issues
@@ -114,19 +127,19 @@ function App() {
 
   // Debug logging for auth state
   useEffect(() => {
-    if (sessionChecked) {
-      console.log('Auth state:', {
+    if (sessionChecked || emergencyMode) {
+      console.log('App render state:', {
         user: user?.email || 'not logged in',
         isPremium,
         loading,
-        sessionChecked
+        sessionChecked,
+        emergencyMode
       });
     }
-  }, [user, isPremium, loading, sessionChecked]);
+  }, [user, isPremium, loading, sessionChecked, emergencyMode]);
   
-  // CRITICAL: Don't render routes until auth state is confirmed
-  // This prevents the flash of wrong content
-  if (loading || !sessionChecked) {
+  // CRITICAL: Don't render routes until auth state is confirmed OR emergency mode
+  if ((loading || !sessionChecked) && !emergencyMode) {
     return <LoadingScreen />;
   }
   
@@ -143,6 +156,13 @@ function App() {
         backgroundColor: '#000',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)'
       }}>
+        {/* Emergency mode warning */}
+        {emergencyMode && (
+          <div className="fixed top-4 left-4 bg-red-500 text-white px-3 py-1 rounded text-xs z-50">
+            Emergency Mode: Auth timeout
+          </div>
+        )}
+        
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
@@ -151,7 +171,7 @@ function App() {
           <Route 
             path="/signin" 
             element={
-              user ? (
+              (user && !emergencyMode) ? (
                 isPremium ? (
                   <Navigate to="/dashboard" replace />
                 ) : (
@@ -166,7 +186,7 @@ function App() {
           <Route 
             path="/signup" 
             element={
-              user ? (
+              (user && !emergencyMode) ? (
                 isPremium ? (
                   <Navigate to="/dashboard" replace />
                 ) : (
@@ -182,18 +202,26 @@ function App() {
           <Route 
             path="/pricing" 
             element={
-              <ProtectedRoute requireAuth={true}>
+              emergencyMode ? (
                 <PricingScreen />
-              </ProtectedRoute>
+              ) : (
+                <ProtectedRoute requireAuth={true}>
+                  <PricingScreen />
+                </ProtectedRoute>
+              )
             } 
           />
           
           <Route 
             path="/dashboard" 
             element={
-              <ProtectedRoute requireAuth={true} requirePremium={true}>
-                <Dashboard isPremium={isPremium} />
-              </ProtectedRoute>
+              emergencyMode ? (
+                <Dashboard isPremium={false} />
+              ) : (
+                <ProtectedRoute requireAuth={true} requirePremium={true}>
+                  <Dashboard isPremium={isPremium} />
+                </ProtectedRoute>
+              )
             } 
           />
           
@@ -201,7 +229,7 @@ function App() {
           <Route 
             path="*" 
             element={
-              user ? (
+              (user && !emergencyMode) ? (
                 isPremium ? (
                   <Navigate to="/dashboard" replace />
                 ) : (
