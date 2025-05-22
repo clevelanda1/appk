@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Use environment variables with hardcoded fallbacks
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ieqdkscpxmeemmgrrojr.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-actual-anon-key-from-dashboard';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllcWRrc2NweG1lZW1tZ3Jyb2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0Njk1MjIsImV4cCI6MjA2MzA0NTUyMn0.RwM1EqZ0sPRdKQsSnNRw9m9HTtaXNuL4z6xs9Fs6Png';
 
 // Debug logging to verify correct values are being used
 console.log('=== SUPABASE CLIENT INITIALIZATION ===');
