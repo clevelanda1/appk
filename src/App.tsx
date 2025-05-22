@@ -49,17 +49,16 @@ const ProtectedRoute = ({
 }) => {
   const { user, loading, isPremium, sessionChecked } = useAuth();
 
-  // Show loading while checking authentication
+  // CRITICAL: Show loading until we KNOW the auth state
   if (loading || !sessionChecked) {
     return <LoadingScreen />;
   }
 
-  // Redirect to sign in if auth is required but user is not authenticated
+  // Now we can safely evaluate auth requirements
   if (requireAuth && !user) {
     return <Navigate to="/signin" replace />;
   }
 
-  // Redirect to pricing if premium is required but user is not premium
   if (requirePremium && user && !isPremium) {
     return <Navigate to="/pricing" replace />;
   }
@@ -125,7 +124,8 @@ function App() {
     }
   }, [user, isPremium, loading, sessionChecked]);
   
-  // Show loading state if auth is still initializing
+  // CRITICAL: Don't render routes until auth state is confirmed
+  // This prevents the flash of wrong content
   if (loading || !sessionChecked) {
     return <LoadingScreen />;
   }
@@ -178,16 +178,12 @@ function App() {
             } 
           />
           
-          {/* Protected routes */}
+          {/* Protected routes using ProtectedRoute wrapper */}
           <Route 
             path="/pricing" 
             element={
               <ProtectedRoute requireAuth={true}>
-                {isPremium ? (
-                  <Navigate to="/dashboard" replace />
-                ) : (
-                  <PricingScreen />
-                )}
+                <PricingScreen />
               </ProtectedRoute>
             } 
           />
