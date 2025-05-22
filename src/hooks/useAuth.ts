@@ -14,93 +14,129 @@ export function useAuth() {
 
   useEffect(() => {
     let mounted = true;
+    let initTimeout: NodeJS.Timeout;
 
     const initializeAuth = async () => {
       try {
-        // Check for existing session
-        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('Initializing auth...');
         
-        if (error) {
-          console.error('Session check error:', error);
-          // Clear any corrupted session data
-          await supabase.auth.signOut();
-          if (mounted) {
-            setUser(null);
-            setIsPremium(false);
-            setLoading(false);
-            setSessionChecked(true);
-          }
-          return;
-        }
+        // Add timeout protection
+        const timeoutPromise = new Promise((_, reject) => {
+          initTimeout = setTimeout(() => {
+            reject(new Error('Auth initialization timeout'));
+          }, 8000); // 8 second timeout
+        });
 
-        if (session?.user && mounted) {
-          console.log('Existing session found, auto-logging in user:', session.user.email);
+        const sessionPromise = supabase.auth.getSession();
+        
+        // Race between session check and timeout
+        const result = await Promise.race([sessionPromise, timeoutPromise]);
+        
+        // Clear timeout if we got here
+        if (initTimeout) clearTimeout(initTimeout);
+        
+        const { data: { session }, error } = result as any;
+        
+        if (!mounted) return;
+
+        if (error) {
+          console.warn('Session check error (non-fatal):', error.message);
+          // Don't block - just proceed without session
+          setUser(null);
+          setIsPremium(false);
+        } else if (session?.user) {
+          console.log('Existing session found:', session.user.email);
           setUser(session.user);
           
-          // Check premium status
-          await checkPremiumStatus(session.user.id);
+          // Check premium status in background (non-blocking)
+          checkPremiumStatus(session.user.id).catch(err => {
+            console.warn('Premium check failed (non-fatal):', err);
+            setIsPremium(false);
+          });
           
-          // Store session info for debugging
           localStorage.setItem('lastLoginCheck', new Date().toISOString());
         } else {
-          console.log('No existing session found');
-          if (mounted) {
-            setUser(null);
-            setIsPremium(false);
-          }
+          console.log('No existing session');
+          setUser(null);
+          setIsPremium(false);
         }
+        
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.warn('Auth initialization failed (non-fatal):', error);
         if (mounted) {
           setUser(null);
           setIsPremium(false);
         }
       } finally {
         if (mounted) {
+          console.log('Auth initialization complete');
           setLoading(false);
           setSessionChecked(true);
         }
+        if (initTimeout) clearTimeout(initTimeout);
       }
     };
+
+    // Force completion after 10 seconds regardless
+    const forceComplete = setTimeout(() => {
+      if (mounted && (loading || !sessionChecked)) {
+        console.warn('Force completing auth initialization due to timeout');
+        setLoading(false);
+        setSessionChecked(true);
+        setUser(null);
+        setIsPremium(false);
+      }
+    }, 10000);
 
     // Initialize auth
     initializeAuth();
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session?.user?.email);
+    // Listen for auth state changes (simplified)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event);
       
       if (!mounted) return;
 
+      // Ensure loading states are cleared
+      setLoading(false);
+      setSessionChecked(true);
+
       switch (event) {
         case 'SIGNED_IN':
-          setUser(session?.user ?? null);
           if (session?.user) {
-            await checkPremiumStatus(session.user.id);
+            console.log('User signed in:', session.user.email);
+            setUser(session.user);
             localStorage.setItem('lastLoginTime', new Date().toISOString());
+            
+            // Check premium status (non-blocking)
+            checkPremiumStatus(session.user.id).catch(err => {
+              console.warn('Premium check on sign in failed:', err);
+              setIsPremium(false);
+            });
           }
           break;
           
         case 'SIGNED_OUT':
+          console.log('User signed out');
           setUser(null);
           setIsPremium(false);
-          // Clear auth-related localStorage
           localStorage.removeItem('lastLoginTime');
           localStorage.removeItem('lastLoginCheck');
           break;
           
         case 'TOKEN_REFRESHED':
-          console.log('Session token refreshed');
-          setUser(session?.user ?? null);
+          console.log('Token refreshed');
           if (session?.user) {
-            await checkPremiumStatus(session.user.id);
+            setUser(session.user);
+            checkPremiumStatus(session.user.id).catch(console.warn);
           }
           break;
           
         default:
+          // Handle any other auth events
           setUser(session?.user ?? null);
           if (session?.user) {
-            await checkPremiumStatus(session.user.id);
+            checkPremiumStatus(session.user.id).catch(console.warn);
           } else {
             setIsPremium(false);
           }
@@ -110,57 +146,42 @@ export function useAuth() {
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      if (initTimeout) clearTimeout(initTimeout);
+      clearTimeout(forceComplete);
     };
   }, []);
 
-  // Auto-refresh session periodically
+  // Simplified session refresh - only for PWA
   useEffect(() => {
     if (!user || !sessionChecked) return;
 
+    // Detect if running as PWA
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                  (window.navigator as any).standalone || 
+                  document.referrer.includes('android-app://');
+    
+    // Only do periodic checks for PWA
+    if (!isPWA) {
+      console.log('Web browser detected - skipping periodic session checks');
+      return;
+    }
+
+    console.log('PWA detected - enabling session monitoring');
+    
     const refreshInterval = setInterval(async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error('Session refresh check failed:', error);
-          return;
-        }
-        
-        if (!session) {
-          console.log('Session expired, signing out user');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session && user) {
+          console.log('PWA: Session expired, signing out');
           await signOut();
-        } else {
-          console.log('Session is still valid');
         }
       } catch (error) {
-        console.error('Session check error:', error);
+        console.warn('PWA session check failed:', error);
       }
-    }, 5 * 60 * 1000); // Check every 5 minutes
+    }, 10 * 60 * 1000); // Check every 10 minutes
 
     return () => clearInterval(refreshInterval);
   }, [user, sessionChecked]);
-
-  // Check app visibility and refresh session when app becomes active
-  useEffect(() => {
-    if (!user) return;
-
-    const handleVisibilityChange = async () => {
-      if (!document.hidden) {
-        console.log('App became visible, checking session...');
-        try {
-          const { data: { session }, error } = await supabase.auth.getSession();
-          if (error || !session) {
-            console.log('Session invalid on app focus, signing out');
-            await signOut();
-          }
-        } catch (error) {
-          console.error('Session check on visibility change failed:', error);
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [user]);
 
   const checkPremiumStatus = async (userId: string | undefined) => {
     if (!userId) {
@@ -169,39 +190,36 @@ export function useAuth() {
     }
 
     try {
-      console.log('Checking premium status for user:', userId);
+      console.log('Checking premium status...');
       
-      // Check if user has any completed orders
-      const { data: orders, error } = await supabase
+      // Add timeout to premium check
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Premium check timeout')), 5000);
+      });
+
+      const queryPromise = supabase
         .from('stripe_orders')
         .select('status')
         .eq('status', 'completed')
         .not('payment_status', 'eq', 'unpaid');
 
+      const { data: orders, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+
       if (error) throw error;
 
-      // User is premium if they have at least one completed order
       const premium = orders && orders.length > 0;
       setIsPremium(premium);
-      
       console.log('Premium status:', premium);
       
-      // Store premium status with timestamp
-      localStorage.setItem('premiumStatus', JSON.stringify({
-        isPremium: premium,
-        checkedAt: new Date().toISOString(),
-        userId
-      }));
-      
     } catch (error) {
-      console.error('Error checking premium status:', error);
+      console.warn('Premium status check failed:', error);
       setIsPremium(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting sign in for:', email);
+      console.log('Signing in:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
@@ -213,17 +231,9 @@ export function useAuth() {
         return { error, data: null };
       }
 
-      if (data.user) {
-        console.log('Sign in successful for:', data.user.email);
-        
-        // Check premium status immediately after sign in
-        await checkPremiumStatus(data.user.id);
-        
-        // Store successful login
-        localStorage.setItem('lastSuccessfulLogin', new Date().toISOString());
-      }
-      
+      console.log('Sign in successful');
       return { error: null, data };
+      
     } catch (error) {
       console.error('Sign in exception:', error);
       return { error, data: null };
@@ -232,18 +242,10 @@ export function useAuth() {
 
   const signUp = async (email: string, password: string) => {
     try {
-      console.log('Attempting sign up for:', email);
-      
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password 
       });
-      
-      if (error) {
-        console.error('Sign up error:', error);
-      } else {
-        console.log('Sign up successful for:', email);
-      }
       
       return { error, data };
     } catch (error) {
@@ -253,9 +255,7 @@ export function useAuth() {
   };
 
   const signInWithGoogle = async () => {
-    try {
-      console.log('Attempting Google sign in');
-      
+    try {      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -267,12 +267,6 @@ export function useAuth() {
         }
       });
       
-      if (error) {
-        console.error('Google sign in error:', error);
-      } else {
-        console.log('Google sign in initiated');
-      }
-      
       return { error };
     } catch (error) {
       console.error('Google sign in exception:', error);
@@ -282,19 +276,15 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      console.log('Signing out user');
+      console.log('Signing out...');
       
       const { error } = await supabase.auth.signOut();
       
-      if (error) {
-        console.error('Sign out error:', error);
-      }
-      
-      // Clear state immediately regardless of API response
+      // Clear state immediately
       setUser(null);
       setIsPremium(false);
       
-      // Clear all related localStorage items
+      // Clear localStorage
       localStorage.removeItem('lastSelectedContact');
       localStorage.removeItem('bankName');
       localStorage.removeItem('cardLastFour');
@@ -303,29 +293,14 @@ export function useAuth() {
       localStorage.removeItem('lastSuccessfulLogin');
       localStorage.removeItem('premiumStatus');
       
-      console.log('User signed out and localStorage cleared');
-      
       return { error };
     } catch (error) {
       console.error('Sign out exception:', error);
-      // Still clear local state even if API call fails
+      // Clear state anyway
       setUser(null);
       setIsPremium(false);
       return { error };
     }
-  };
-
-  // Helper function to check if user session is fresh
-  const isSessionFresh = () => {
-    const lastLogin = localStorage.getItem('lastLoginTime');
-    if (!lastLogin) return false;
-    
-    const loginTime = new Date(lastLogin);
-    const now = new Date();
-    const hoursSinceLogin = (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
-    
-    // Consider session fresh if login was within last 24 hours
-    return hoursSinceLogin < 24;
   };
 
   return {
@@ -336,7 +311,6 @@ export function useAuth() {
     signIn,
     signUp,
     signInWithGoogle,
-    signOut,
-    isSessionFresh
+    signOut
   };
 }
