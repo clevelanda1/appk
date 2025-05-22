@@ -156,10 +156,9 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
       </div>
       
       {/* iOS-style home indicator */}
-      <div className="absolute bottom-8 w-full flex flex-col items-center space-y-3">
+      {/*<div className="absolute bottom-8 w-full flex flex-col items-center space-y-3">
         <p className="text-gray-50/10 text-xs font-medium">Apple Pay Prank v1.0</p>
-        <div className="w-32 h-1 bg-white/20 rounded-full"></div>
-      </div>
+          </div>*/}
     </div>
   );
 };
