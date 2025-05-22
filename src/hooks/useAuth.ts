@@ -17,50 +17,40 @@ export function useAuth() {
 
     const initializeAuth = async () => {
       try {
-        console.log('Initializing auth...');
-        
-        // Get initial session with timeout
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session check timeout')), 10000)
-        );
-        
-        const { data: { session }, error } = await Promise.race([
-          sessionPromise,
-          timeoutPromise
-        ]) as any;
-        
-        if (!mounted) return;
+        // Check for existing session
+        const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.warn('Session check error:', error.message);
-          // Don't sign out on error, just proceed without session
-          setUser(null);
-          setIsPremium(false);
-          setLoading(false);
-          setSessionChecked(true);
+          console.error('Session check error:', error);
+          // Clear any corrupted session data
+          await supabase.auth.signOut();
+          if (mounted) {
+            setUser(null);
+            setIsPremium(false);
+            setLoading(false);
+            setSessionChecked(true);
+          }
           return;
         }
 
-        if (session?.user) {
+        if (session?.user && mounted) {
           console.log('Existing session found, auto-logging in user:', session.user.email);
           setUser(session.user);
           
-          // Check premium status in background
-          checkPremiumStatus(session.user.id).catch(err => {
-            console.warn('Premium status check failed:', err);
-            setIsPremium(false);
-          });
+          // Check premium status
+          await checkPremiumStatus(session.user.id);
           
+          // Store session info for debugging
           localStorage.setItem('lastLoginCheck', new Date().toISOString());
         } else {
           console.log('No existing session found');
-          setUser(null);
-          setIsPremium(false);
+          if (mounted) {
+            setUser(null);
+            setIsPremium(false);
+          }
         }
-        
       } catch (error) {
-        console.warn('Auth initialization failed:', error);
+        console.error('Auth initialization error:', error);
         if (mounted) {
           setUser(null);
           setIsPremium(false);
@@ -78,44 +68,39 @@ export function useAuth() {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session?.user?.email || 'no user');
+      console.log('Auth state change:', event, session?.user?.email);
       
       if (!mounted) return;
 
-      // Always update loading state
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        setLoading(false);
-        setSessionChecked(true);
-      }
-
       switch (event) {
         case 'SIGNED_IN':
+          setUser(session?.user ?? null);
           if (session?.user) {
-            setUser(session.user);
+            await checkPremiumStatus(session.user.id);
             localStorage.setItem('lastLoginTime', new Date().toISOString());
-            // Check premium status without blocking
-            checkPremiumStatus(session.user.id).catch(console.warn);
           }
           break;
           
         case 'SIGNED_OUT':
           setUser(null);
           setIsPremium(false);
+          // Clear auth-related localStorage
           localStorage.removeItem('lastLoginTime');
           localStorage.removeItem('lastLoginCheck');
           break;
           
         case 'TOKEN_REFRESHED':
+          console.log('Session token refreshed');
+          setUser(session?.user ?? null);
           if (session?.user) {
-            setUser(session.user);
-            checkPremiumStatus(session.user.id).catch(console.warn);
+            await checkPremiumStatus(session.user.id);
           }
           break;
           
         default:
           setUser(session?.user ?? null);
           if (session?.user) {
-            checkPremiumStatus(session.user.id).catch(console.warn);
+            await checkPremiumStatus(session.user.id);
           } else {
             setIsPremium(false);
           }
@@ -128,52 +113,47 @@ export function useAuth() {
     };
   }, []);
 
-  // Simplified session refresh - only for PWA
+  // Auto-refresh session periodically
   useEffect(() => {
     if (!user || !sessionChecked) return;
 
-    // Only run periodic checks for PWA or if explicitly enabled
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                  window.navigator.standalone || 
-                  document.referrer.includes('android-app://');
-    
-    if (!isPWA) return; // Skip for regular web
-
     const refreshInterval = setInterval(async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session && user) {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Session refresh check failed:', error);
+          return;
+        }
+        
+        if (!session) {
           console.log('Session expired, signing out user');
           await signOut();
+        } else {
+          console.log('Session is still valid');
         }
       } catch (error) {
-        console.warn('Session check error:', error);
+        console.error('Session check error:', error);
       }
-    }, 10 * 60 * 1000); // Check every 10 minutes instead of 5
+    }, 5 * 60 * 1000); // Check every 5 minutes
 
     return () => clearInterval(refreshInterval);
   }, [user, sessionChecked]);
 
-  // Simplified visibility change handler
+  // Check app visibility and refresh session when app becomes active
   useEffect(() => {
     if (!user) return;
 
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                  window.navigator.standalone;
-    
-    if (!isPWA) return; // Only for PWA
-
     const handleVisibilityChange = async () => {
       if (!document.hidden) {
-        console.log('PWA became visible, checking session...');
+        console.log('App became visible, checking session...');
         try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (!session) {
+          const { data: { session }, error } = await supabase.auth.getSession();
+          if (error || !session) {
             console.log('Session invalid on app focus, signing out');
             await signOut();
           }
         } catch (error) {
-          console.warn('Session check on visibility change failed:', error);
+          console.error('Session check on visibility change failed:', error);
         }
       }
     };
