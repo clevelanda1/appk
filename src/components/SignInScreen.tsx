@@ -155,7 +155,7 @@ const SignInScreen = () => {
       
       {/* Main content area */}
       <div className="p-6 relative z-10">
-        <div className="mt-3 mb-6 flex justify-between items-center">
+        <div className="mt-6 mb-6 flex justify-between items-center">
           <button
             onClick={() => navigate('/')}
             className="text-blue-500 font-medium text-lg focus:outline-none transition-colors duration-200"
