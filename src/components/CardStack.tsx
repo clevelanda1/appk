@@ -257,7 +257,7 @@ const CardStack: React.FC<CardStackProps> = ({
 
       <div className="px-6 pb-16">
         {showSignOutConfirm ? (
-          <div className="pt-4 pb-2">
+          <div className="pt-4 pb-0">
             <div className="flex flex-col items-center justify-center py-6">
               <h2 className="text-white text-xl font-semibold mb-1">Sign Out?</h2>
               <p className="text-gray-400 text-sm text-center mb-8">
