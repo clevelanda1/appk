@@ -255,7 +255,7 @@ const CardStack: React.FC<CardStackProps> = ({
         <div className="w-32 h-1 bg-gray-600 rounded-full opacity-30"></div>
       </div>
 
-      <div className="px-6 pb-12">
+      <div className="px-6 pb-2">
         {showSignOutConfirm ? (
           <div className="pt-4 pb-2">
             <div className="flex flex-col items-center justify-center py-6">
