@@ -68,7 +68,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
   // Handle the processing stages - transitions to confirmed then navigates
   useEffect(() => {
     const processingDuration = 2000; // Total time in processing state (2 seconds)
-    const soundDelay = processingDuration - 0; // Play sound at the same time
+    const soundDelay = processingDuration - 100; // Play sound at the same time
     
     // Play the sound shortly before changing state
     const soundTimer = setTimeout(async () => {
