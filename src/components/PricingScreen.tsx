@@ -38,7 +38,7 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
 
       {/* Simple header with working button */}
       <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 mt-6">
           <button
             onClick={handleDone}
             className="text-blue-500 font-medium text-lg hover:text-blue-400 focus:outline-none"
