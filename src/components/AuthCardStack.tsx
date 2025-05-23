@@ -68,7 +68,7 @@ const AuthCardStack: React.FC<AuthCardStackProps> = ({
                   <p className="text-gray-400 text-sm mt-1">All Features Included</p>
                 </div>
                 <div className="flex flex-col items-end">
-                  <div className="text-white font-bold text-2xl">$5.99</div>
+                  <div className="text-white font-bold text-2xl">$4.99</div>
                   <div className="text-gray-400 text-xs">One-time Purchase</div>
                 </div>
               </div>

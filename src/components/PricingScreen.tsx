@@ -77,7 +77,7 @@ const PricingScreen: React.FC<PricingScreenProps> = ({ setIsPremium }) => {
                   </p>
                 </div>
                 <div className="flex flex-col items-end">
-                  <div className="text-white font-bold text-2xl">$5.99</div>
+                  <div className="text-white font-bold text-2xl">$4.99</div>
                   <div className="text-gray-400 text-xs">One-time Payment</div>
                 </div>
               </div>
