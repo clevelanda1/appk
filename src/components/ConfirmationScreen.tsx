@@ -640,13 +640,6 @@ const ConfirmationScreen: React.FC<ConfirmationScreenProps> = ({
             </div>
           </div>
           
-          <div className="mt-4 text-center pb-2 flex-shrink-0">
-            <button className="text-blue-500 font-medium relative inline-block overflow-hidden py-1">
-              <div className="absolute bottom-0 left-0 right-0 h-[0.5px] bg-blue-100 opacity-0"></div>
-              Pay with Passcode
-            </button>
-          </div>
-          
           <div className="w-full flex justify-center mt-2 mb-3 flex-shrink-0">
             <div className="w-32 h-1 bg-gray-300 opacity-60 rounded-full"></div>
           </div>
