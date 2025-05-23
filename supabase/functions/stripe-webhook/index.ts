@@ -2,36 +2,40 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import Stripe from 'npm:stripe@17.7.0';
 import { createClient } from 'npm:@supabase/supabase-js@2.49.1';
 
-const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY')!;
-const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
+const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY');
+const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+
 const stripe = new Stripe(stripeSecret, {
   appInfo: {
     name: 'Bolt Integration',
-    version: '1.0.0',
-  },
+    version: '1.0.0'
+  }
 });
 
-const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+const supabase = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'));
 
 // Helper function to create responses with CORS headers
-function corsResponse(body: string | object | null, status = 200) {
+function corsResponse(body, status = 200) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, stripe-signature',
-    'Access-Control-Max-Age': '86400',
+    'Access-Control-Max-Age': '86400'
   };
 
   if (status === 204) {
-    return new Response(null, { status, headers });
+    return new Response(null, {
+      status,
+      headers
+    });
   }
 
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       ...headers,
-      'Content-Type': 'application/json',
-    },
+      'Content-Type': 'application/json'
+    }
   });
 }
 
@@ -43,35 +47,46 @@ Deno.serve(async (req) => {
     }
 
     if (req.method !== 'POST') {
-      return corsResponse({ error: 'Method not allowed' }, 405);
+      return corsResponse({
+        error: 'Method not allowed'
+      }, 405);
     }
 
     const signature = req.headers.get('stripe-signature');
     if (!signature) {
-      return corsResponse({ error: 'Missing stripe-signature header' }, 400);
+      return corsResponse({
+        error: 'Missing stripe-signature header'
+      }, 400);
     }
 
     const body = await req.text();
-    let event: Stripe.Event;
+    let event;
 
     try {
       event = await stripe.webhooks.constructEventAsync(body, signature, stripeWebhookSecret);
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Webhook signature verification failed: ${error.message}`);
-      return corsResponse({ error: `Webhook signature verification failed: ${error.message}` }, 400);
+      return corsResponse({
+        error: `Webhook signature verification failed: ${error.message}`
+      }, 400);
     }
 
     EdgeRuntime.waitUntil(handleEvent(event));
-    return corsResponse({ received: true });
-  } catch (error: any) {
+
+    return corsResponse({
+      received: true
+    });
+  } catch (error) {
     console.error('Error processing webhook:', error);
-    return corsResponse({ error: error.message }, 500);
+    return corsResponse({
+      error: error.message
+    }, 500);
   }
 });
 
-async function handleEvent(event: Stripe.Event) {
+async function handleEvent(event) {
   const stripeData = event?.data?.object ?? {};
-
+  
   if (!stripeData) {
     return;
   }
@@ -92,42 +107,45 @@ async function handleEvent(event: Stripe.Event) {
     let isSubscription = true;
 
     if (event.type === 'checkout.session.completed') {
-      const { mode } = stripeData as Stripe.Checkout.Session;
+      const { mode } = stripeData;
       isSubscription = mode === 'subscription';
       console.info(`Processing ${isSubscription ? 'subscription' : 'one-time payment'} checkout session`);
     }
 
-    const { mode, payment_status } = stripeData as Stripe.Checkout.Session;
+    const { mode, payment_status } = stripeData;
 
     if (isSubscription) {
       console.info(`Starting subscription sync for customer: ${customerId}`);
       await syncCustomerFromStripe(customerId);
     } else if (mode === 'payment' && payment_status === 'paid') {
       try {
-        const {
-          id: checkout_session_id,
-          payment_intent,
-          amount_subtotal,
-          amount_total,
-          currency,
-        } = stripeData as Stripe.Checkout.Session;
-
+        const { id: checkout_session_id, payment_intent, amount_subtotal, amount_total, currency, metadata } = stripeData;
+        
+        // Extract user_id from metadata
+        const user_id = metadata?.user_id;
+        if (!user_id) {
+          console.error('No user_id found in checkout session metadata');
+          return;
+        }
+        
         const { error: orderError } = await supabase.from('stripe_orders').insert({
           checkout_session_id,
           payment_intent_id: payment_intent,
           customer_id: customerId,
+          user_id: user_id,  // ← Fixed: Added user_id from metadata
           amount_subtotal,
           amount_total,
           currency,
           payment_status,
-          status: 'completed',
+          status: 'completed'
         });
 
         if (orderError) {
           console.error('Error inserting order:', orderError);
           return;
         }
-        console.info(`Successfully processed one-time payment for session: ${checkout_session_id}`);
+
+        console.info(`Successfully processed one-time payment for session: ${checkout_session_id}, user: ${user_id}`);
       } catch (error) {
         console.error('Error processing one-time payment:', error);
       }
@@ -135,26 +153,25 @@ async function handleEvent(event: Stripe.Event) {
   }
 }
 
-async function syncCustomerFromStripe(customerId: string) {
+async function syncCustomerFromStripe(customerId) {
   try {
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       limit: 1,
       status: 'all',
-      expand: ['data.default_payment_method'],
+      expand: [
+        'data.default_payment_method'
+      ]
     });
 
     if (subscriptions.data.length === 0) {
       console.info(`No active subscriptions found for customer: ${customerId}`);
-      const { error: noSubError } = await supabase.from('stripe_subscriptions').upsert(
-        {
-          customer_id: customerId,
-          subscription_status: 'not_started',
-        },
-        {
-          onConflict: 'customer_id',
-        },
-      );
+      const { error: noSubError } = await supabase.from('stripe_subscriptions').upsert({
+        customer_id: customerId,
+        subscription_status: 'not_started'
+      }, {
+        onConflict: 'customer_id'
+      });
 
       if (noSubError) {
         console.error('Error updating subscription status:', noSubError);
@@ -164,31 +181,27 @@ async function syncCustomerFromStripe(customerId: string) {
 
     const subscription = subscriptions.data[0];
 
-    const { error: subError } = await supabase.from('stripe_subscriptions').upsert(
-      {
-        customer_id: customerId,
-        subscription_id: subscription.id,
-        price_id: subscription.items.data[0].price.id,
-        current_period_start: subscription.current_period_start,
-        current_period_end: subscription.current_period_end,
-        cancel_at_period_end: subscription.cancel_at_period_end,
-        ...(subscription.default_payment_method && typeof subscription.default_payment_method !== 'string'
-          ? {
-              payment_method_brand: subscription.default_payment_method.card?.brand ?? null,
-              payment_method_last4: subscription.default_payment_method.card?.last4 ?? null,
-            }
-          : {}),
-        status: subscription.status,
-      },
-      {
-        onConflict: 'customer_id',
-      },
-    );
+    const { error: subError } = await supabase.from('stripe_subscriptions').upsert({
+      customer_id: customerId,
+      subscription_id: subscription.id,
+      price_id: subscription.items.data[0].price.id,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      ...subscription.default_payment_method && typeof subscription.default_payment_method !== 'string' ? {
+        payment_method_brand: subscription.default_payment_method.card?.brand ?? null,
+        payment_method_last4: subscription.default_payment_method.card?.last4 ?? null
+      } : {},
+      status: subscription.status
+    }, {
+      onConflict: 'customer_id'
+    });
 
     if (subError) {
       console.error('Error syncing subscription:', subError);
       throw new Error('Failed to sync subscription in database');
     }
+
     console.info(`Successfully synced subscription for customer: ${customerId}`);
   } catch (error) {
     console.error(`Failed to sync subscription for customer ${customerId}:`, error);
