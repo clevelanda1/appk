@@ -202,5 +202,3 @@ const BankCardCycler = () => {
 };
 
 export default BankCardCycler;
-
-export default BankCardCycler;
