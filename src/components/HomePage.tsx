@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #2D80D2 0%, #1C6ABD 100%)',
       logoInnerBackground: '#0E59A9',
       borderAccent: 'white',
-      bankName: "CHASE"
+      bankName: "Delta Financial"
     },
     {
       id: 'obsidian',
@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #333333 0%, #1A1A1A 100%)',
       logoInnerBackground: '#333333',
       borderAccent: '#888888',
-      bankName: "CITI"
+      bankName: "UNITI"
     },
     {
       id: 'rose-gold',
@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #D1A193 0%, #BD8C7D 100%)',
       logoInnerBackground: '#9D6B5E',
       borderAccent: '#F4DAD3',
-      bankName: "BANK OF AMERICA"
+      bankName: "Eagle Point Bank"
     },
     {
       id: 'emerald',
@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #1E8449 0%, #117A65 100%)',
       logoInnerBackground: '#0B5345',
       borderAccent: '#7DCEA0',
-      bankName: "CAPITAL ONE"
+      bankName: "UNITED FEDERAL TRUST"
     },
     {
       id: 'amethyst',
@@ -87,7 +87,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #AF7AC5 0%, #9B59B6 100%)',
       logoInnerBackground: '#512E5F',
       borderAccent: '#D7BDE2',
-      bankName: "DISCOVER"
+      bankName: "Allied Commercial Bank"
     }
   ];
   
