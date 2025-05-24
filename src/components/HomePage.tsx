@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #2D80D2 0%, #1C6ABD 100%)',
       logoInnerBackground: '#0E59A9',
       borderAccent: 'white',
-      bankName: "Delta Financial"
+      bankName: "UNITI"
     },
     {
       id: 'obsidian',
@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #333333 0%, #1A1A1A 100%)',
       logoInnerBackground: '#333333',
       borderAccent: '#888888',
-      bankName: "UNITI"
+      bankName: "Delta Financial Group"
     },
     {
       id: 'rose-gold',
@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #D1A193 0%, #BD8C7D 100%)',
       logoInnerBackground: '#9D6B5E',
       borderAccent: '#F4DAD3',
-      bankName: "Eagle Point Bank"
+      bankName: "Prime Credit Union"
     },
     {
       id: 'emerald',
