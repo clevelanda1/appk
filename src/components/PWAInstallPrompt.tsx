@@ -104,14 +104,14 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 
       <div className="px-6 pb-1">
         <div className="text-center mb-2">
-          <h2 className="text-white text-xl font-bold">Add to Home Screen</h2>
-          <p className="text-gray-400 text-sm mt-1">This application is designed as an app.</p>
+          <h2 className="text-white text-xl font-bold">Native Mobile App</h2>
+          <p className="text-gray-400 text-sm mt-1">Designed to feel natural as an app.</p>
         </div>
 
         <div className="py-5">
           <div className="rounded-2xl overflow-hidden mb-6 bg-gray-800/60 border border-gray-700/30">
             <div className="bg-blue-500 py-3 px-3 text-white font-semibold tracking-wide text-center text-sm">
-              FOR NATIVE MOBILE EXPERIENCE
+              QUICK SETUP GUIDE
             </div>
             
             <div className="p-5">
