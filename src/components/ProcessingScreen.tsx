@@ -187,7 +187,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
       <div className="absolute top-0 left-1/4 w-1/2 h-80 rounded-full bg-blue-500 opacity-5 blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-40 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
       
-      <div className="flex flex-col items-center justify-center h-screen px-6 relative z-10">
+      <div className="flex flex-col items-center justify-center w-full space-y-8"> {/* h-screen px-6 relative z-10"*/)
         {/* Fixed positioning structure */}
         <div className="flex flex-col items-center w-full" style={{ height: '280px' }}>
           {/* Apple Pay Logo - absolutely positioned to stay in one place */}
