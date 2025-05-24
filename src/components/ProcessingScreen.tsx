@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Apple, Asterisk } from 'react-bootstrap-icons';
+import { Bullseye } from 'react-bootstrap-icons';
 
 interface ProcessingScreenProps {
   onComplete?: () => void;
@@ -196,7 +196,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
               ${processingStage === 'processing' ? 'animate-pulse' : ''} 
               transition-all duration-500 ease-in-out`}
             >
-              <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAADhElEQVR4nO2aSWxNURjHf6VqWKghQVGSGprQqGFhiIUgYoxUWNCVRFMbVGnSxMoQGzYWRUwNUVpCKkhDpEkjIsaFhpgiiERMFaqTqXKS7yUnN9cb+u4575T7S/6bd+895/6/d8853xkgJCQkJCTENfoA64DzQA2QzX/EYuAN0Kmpmm7wjw0OoJwS4LfHvNIpHGM0sAVoAD5qL9oOPAX2AwuAHgmUudLHfCtwBhiOI4wFjgM/fP4lPz0C1gBpMcodD3zxPFsT0FcVCD2BMqAtTuNe1QM5Ucpv8Nx/MMGvxyiDgKtdNK7rK7Dcp/x5nvvuAb1whJHA4wDMR/QLKPbUUe25nocjDAGeB2g+ItXRFWn1TAZ+yrVaHCEduGXAfESqE52v1XdBfr8NbJMRZEAK/bPWoPmIGrX6in2ufwfOAUukE7bKUQsBUMqU+gpi3PcKKIxjOA2MvRbMt0tTU6yP85kbwDQbAcjTOiZTOqLVdzLB/qPcxtdQYtD8A62TU3lGSxfKqAIyTAdhlwHzT4ARWh0VSZR10UbSVCYJShDm1TA3TCt7UQBln8ACS4EPSb5oJdBXKzMfaAoosBtsZYan/zJfj6aXEkCd6Z5pdBAjSi6WyJf8vSWORKfIp6MqkhfuDFjXsEw/YJmkrhXSFnfLmD7G5/5xwBUDxnXNxUEmypgf7yJKMlLTdivkAjO0TE4nQ7I1lazctGBalxpRRtkIQKVU2CZT5jvAXeCFhQwylkptBOBdik1G02UbC6OdDuuz6QAUOGAyloaaDECpAwZjaabJAOx0wGAsqSU1Y+xxwGAsqWZqjB2GX75ZMsq6JMpYaDIAWw0HQJlH5vnN2u/qy9sMfEt1H7DCcADqxPxULal6qNV/LNWjwAQLbbjZk1G2yhQ6W1aUoj2r1hiMkhbA4ohJqU0W49RYmtg0ygZJIs9ttBGAAgsB2KQdnIj3GdVssmwEIMPChGiV1DUrgWcuYZFywwH4BBz2OTAVTbNtBqA/8NZCU0hk+LROoQPGlTpsrgp7qXIgAJEOMyVkBnyMJlGdtbltHu0s0esUmL8py/NOkAM8s2i+Xjpip8gCrlswf8jG1nhXSZc1gw4Dxt8Dq+km5Mqxt0Q3U/2k9h/2AQPphkwCDnRxK1xttGy3ld+bpjcwR5pHrRykbpI9wzb5vO/LzrM6iT7FheEtJCQkJCQkhH+WP4Fw01DwTB7nAAAAAElFTkSuQmCC" alt="orange" className="w-14 h-14 -mt-1 brightness-0 invert"></img>
+              <Bullseye className="w-16 h-16 text-white -mt-1" />
             </div>
           </div>
           
