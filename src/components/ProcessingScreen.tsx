@@ -196,7 +196,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
               ${processingStage === 'processing' ? 'animate-pulse' : ''} 
               transition-all duration-500 ease-in-out`}
             >
-              <Asterisk className="w-10 h-10 text-white -mt-1" />
+              {/*<Asterisk className="w-10 h-10 text-white -mt-1" />*/}
             </div>
           </div>
           
