@@ -438,7 +438,7 @@ const CardScreen: React.FC<CardScreenProps> = ({
                  }}></div>
             
             <span className="relative z-10 text-white/60 transition-colors duration-300 flex items-center justify-center">
-              <Asterisk className="w-5 h-5 mr-2 opacity-80" />
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAADr0lEQVR4nO2aaYhNYRjHf8a+jC2U7FuRJZMlPljDIF+QKHvyQZFQfKCUPaSIyDaWKIkiWRIfECVlywdbaSwZM0Zj7MvQU/9bb9e999xz59x7zge/mpo553nP+z/veZ/3fd7nGfhPxtQFCoHNwHngMVAOfAeuE2HaANuACuBPkh97iVC4BdwG8hPcqwEsBCodoU+AncAcYAgwVddLCIk7EnAq7npN4KAj/AwwMEH7Gbp/k5DoALyXiLnO9e269gmYnKL9ftltIESmSIQ5ZFM5qv39Cxieol0DoFS2AwiZUxKyVj5hv6/2aLNCdvflL6HSHfgNfJWoV0CdFPb9HNthOdRJM2A58BTYGnfvguO09iWSMQwok90OckRDCf7siDQHdJnv3BuV4BmdgCL5htmcBvJyIX488EKdVmkXLUwwb3s4L9BfK9RgYBFwCfgRt3l9AKZnU7gJXON0aM5ZkMI+P8VO+0cvcERf56Jz/bCHv2REHXVmHfwElmpz8uKmvlK5dlfbqfdpqW0SZzvTmZKXk+zmGY/8UT3Y4pcxZI8CoFh9XQ3qS6xyxKeaMkHRGXijPu2rV4tCTQFbKcaRO3o70aobkviiPvBMD7G1PtfMdFantpk8ILbi3AVqEQ4npeGQ34aNFbfb9BlEeHTWcmsrX1c/DRc6y1nY7JEWO/ikzSM1mkj49JWWd+lO5Y5qUBri3I/noTSNJg1mOcFVVNiURlT7z7FuMdFhkjRZ4OjJFRmPJDp0kiYLMzx5IGPbDaNCQ2myYM+TWBzSmmjxTbrqeRmWyLAV0eKLdFmIk5LnMuxCdKjtnEU8uSHjEUSHLn6c+ICMF2RfFxuUrVvvYTfBT2izQMbHyD6V6utjmhvZxnSTUmb8NsBQItlIr9dLrPNof89PKOEGc+NyPNKJ6Km2ZX7OyLE85TmCId2RTsRuadmFD5prtKqUtwyLdtrA7EzeLZN5Gys25IW0Ap2sTnaikZOjWUbwePlFrNxUUZ2wZqzS5HYuHUqwpPKLnk5aZV4QHcXSG3a8yzbtnS9f7cQWmv/HnJewamK26AW8dFKLVksOLJg67tRwl2ShDDTd8YsrSu0ESp629Cp1cg3oE1Du56yTXi8KcuSTFTheq7PfKugNz2CptUpkkVPosBT8bHJEvv7HwS0xFSshMEviWmgka2tjtMz2NCWonsQVOvaGdYBqqfJp7BDk58e+4haVnkLHHNpG2Da8E0oIW/BlYYCNsE0PS07ZdFupWlk6FR5P/gIJZj7ivG99vwAAAABJRU5ErkJggg==" alt="orange">
               Request
             </span>
           </button>
