@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #1E8449 0%, #117A65 100%)',
       logoInnerBackground: '#0B5345',
       borderAccent: '#7DCEA0',
-      bankName: "UNITED FEDERAL TRUST"
+      bankName: "UNITED FEDERAL"
     },
     {
       id: 'amethyst',
