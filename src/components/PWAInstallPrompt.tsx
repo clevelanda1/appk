@@ -104,8 +104,8 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 
       <div className="px-6 pb-1">
         <div className="text-center mb-2">
-          <h2 className="text-white text-xl font-bold">Add to Home Screen</h2>
-          <p className="text-gray-400 text-sm mt-1">Experience Apple Pay Prank at its best</p>
+          <h2 className="text-white text-xl font-bold">Native Mobile Experience</h2>
+          <p className="text-gray-400 text-sm mt-1">This application is designed as an app.</p>
         </div>
 
         <div className="py-5">
