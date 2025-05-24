@@ -41,7 +41,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         <div className="mt-2">
           <p className="text-gray-300 mb-4">
             <span className="font-medium text-white">Step 1:</span> Click the
-            <span className="bg-gray-700 rounded px-2 py-0.5 mx-1 text-sm">share</span>
+            <span className="bg-gray-700 rounded px-2 py-0.5 mx-1 text-sm">Share</span>
             option in your browser window
           </p>
           <p className="text-gray-300">
