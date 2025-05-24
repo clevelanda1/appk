@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Apple } from 'react-bootstrap-icons';
+import { Apple, Asterisk } from 'react-bootstrap-icons';
 
 interface ProcessingScreenProps {
   onComplete?: () => void;
@@ -196,7 +196,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
               ${processingStage === 'processing' ? 'animate-pulse' : ''} 
               transition-all duration-500 ease-in-out`}
             >
-              <Apple className="w-10 h-10 text-white -mt-1" />
+              <Asterisk className="w-10 h-10 text-white -mt-1" />
             </div>
           </div>
           

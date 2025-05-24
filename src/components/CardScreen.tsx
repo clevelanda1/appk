@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { MoreVertical, Lock } from 'lucide-react';
-import { Apple } from 'react-bootstrap-icons';
+import { Apple, Asterisk } from 'react-bootstrap-icons';
 import CardStack from './CardStack';
 
 type CardTheme = {
@@ -438,7 +438,7 @@ const CardScreen: React.FC<CardScreenProps> = ({
                  }}></div>
             
             <span className="relative z-10 text-white/60 transition-colors duration-300 flex items-center justify-center">
-              <Apple className="w-5 h-5 mr-2 opacity-80" />
+              <Asterisk className="w-5 h-5 mr-2 opacity-80" />
               Request
             </span>
           </button>
