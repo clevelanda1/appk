@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #D1A193 0%, #BD8C7D 100%)',
       logoInnerBackground: '#9D6B5E',
       borderAccent: '#F4DAD3',
-      bankName: "Prime Credit Union"
+      bankName: "Peak Credit Union"
     },
     {
       id: 'emerald',
@@ -87,7 +87,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #AF7AC5 0%, #9B59B6 100%)',
       logoInnerBackground: '#512E5F',
       borderAccent: '#D7BDE2',
-      bankName: "Allied Commercial Bank"
+      bankName: "Allied Commercial"
     }
   ];
   
