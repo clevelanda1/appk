@@ -196,7 +196,7 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
               ${processingStage === 'processing' ? 'animate-pulse' : ''} 
               transition-all duration-500 ease-in-out`}
             >
-              <Bullseye className="w-16 h-16 text-white -mt-1" />
+              <Bullseye className="w-16 h-16 text-white -mt-3" />
             </div>
           </div>
           
