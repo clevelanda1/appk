@@ -191,14 +191,14 @@ const ProcessingScreen: React.FC<ProcessingScreenProps> = ({
         {/* Fixed positioning structure */}
         <div className="flex flex-col items-center w-full" style={{ height: '280px' }}>
           {/* Apple Pay Logo - absolutely positioned to stay in one place */}
-          <div className="absolute" style={{ top: '25%', transform: 'translateY(-50%)' }}>
+          {/*<div className="absolute" style={{ top: '25%', transform: 'translateY(-50%)' }}>
             <div className={`w-24 h-24 rounded-full bg-black flex items-center justify-center 
               ${processingStage === 'processing' ? 'animate-pulse' : ''} 
               transition-all duration-500 ease-in-out`}
             >
               <FilterCircle className="w-14 h-14 text-white mt-0" />
             </div>
-          </div>
+          </div>*/}
           
           {/* Processing Animation - positioned below the Apple logo */}
           <div className="absolute" style={{ top: '50%', transform: 'translateY(-50%)' }}>
