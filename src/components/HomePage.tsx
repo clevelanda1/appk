@@ -48,7 +48,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #333333 0%, #1A1A1A 100%)',
       logoInnerBackground: '#333333',
       borderAccent: '#888888',
-      bankName: "Delta Financial Group"
+      bankName: "American National Bank"
     },
     {
       id: 'rose-gold',
@@ -87,7 +87,7 @@ const HomePage: React.FC = () => {
       logoBackground: 'linear-gradient(135deg, #AF7AC5 0%, #9B59B6 100%)',
       logoInnerBackground: '#512E5F',
       borderAccent: '#D7BDE2',
-      bankName: "Regional Bank"
+      bankName: "First American Bank"
     }
   ];
   
