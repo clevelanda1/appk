@@ -88,7 +88,7 @@ const AuthCardStack: React.FC<AuthCardStackProps> = ({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-gray-300">Native Apple Pay Sound</span>
+                  <span className="text-gray-300">Native Success Chime</span>
                 </div>
                 <div className="flex items-center text-sm">
                   <div className="w-5 h-5 mr-3 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
