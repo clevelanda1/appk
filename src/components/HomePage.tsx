@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { useAuth } from '../hooks/useAuth';
 import BankCardCycler from './BankCardCycler';
 import MobileOnlyPopup from './MobileOnlyPopup';
@@ -144,19 +143,6 @@ const HomePage: React.FC = () => {
       imageUrl: "/5.png"
     }
   ];
-  
-  const { isSwiping } = useSwipeGesture(containerRef, {
-    onSwipeUp: () => {
-      if (!showFeatures) {
-        setShowFeatures(true);
-      }
-    },
-    onSwipeDown: () => {
-      if (showFeatures) {
-        setShowFeatures(false);
-      }
-    },
-  });
   
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -393,19 +379,15 @@ const HomePage: React.FC = () => {
   }
   
   return (
-    // Fixed positioning with inset-0 ensures full viewport coverage
     <div 
       ref={containerRef}
       className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black overflow-auto"
       style={{
-        // Use custom viewport height variables for iOS/mobile
         height: 'calc(var(--vh, 1vh) * 100)',
-        // Apply padding for top and bottom safe areas
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
         paddingRight: 'env(safe-area-inset-right, 0px)',
-        // Additional styles to ensure full coverage
         margin: 0,
         display: 'flex',
         flexDirection: 'column',
@@ -531,9 +513,6 @@ const HomePage: React.FC = () => {
                   style={{ animationDuration: "2s" }}
                 >
                   Explore features
-                  {/*<svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-        </svg>*/}
                 </button>
               </div>
             </div>
@@ -550,9 +529,6 @@ const HomePage: React.FC = () => {
                 <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white to-transparent opacity-10 pointer-events-none rounded-t-full"></div>
                 <span className="relative z-10 flex items-center justify-center">
                   Get Started
-                  {/*<svg className="w-4 h-4 ml-1.5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>*/}
                 </span>
               </button>
             </div>
@@ -598,9 +574,7 @@ const HomePage: React.FC = () => {
                     />
                     {feature.premium && (
                       <div className="absolute top-4 right-4">
-                        {/*<div className="bg-black bg-opacity-80 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                          Preminum
-                    </div>*/}
+                        {/* Premium badge commented out */}
                       </div>
                     )}
                   </div>
@@ -644,12 +618,6 @@ const HomePage: React.FC = () => {
               {/* Pricing Info */}
               <div className="space-y-3">
                 <div className="flex items-center justify-center space-x-6 text-sm">
-                  {/*<div className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Free to start
-                      </div>*/}
                   <div className="flex items-center text-gray-600">
                     <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
