@@ -24,8 +24,6 @@ const HomePage: React.FC = () => {
   const [randomCardNumbers, setRandomCardNumbers] = useState('4852');
   const [isPWAPromptVisible, setIsPWAPromptVisible] = useState(false);
   const [showFeatures, setShowFeatures] = useState(false);
-  const [isPWAMode, setIsPWAMode] = useState(false);
-  const [hasNavigatedToFeatures, setHasNavigatedToFeatures] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -221,18 +219,8 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     // Check if the app is already running in standalone mode (installed as PWA)
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        (window.navigator as any).standalone || // For iOS
+                        window.navigator.standalone || // For iOS
                         document.referrer.includes('android-app://');
-    
-    console.log('PWA Detection:', {
-      displayMode: window.matchMedia('(display-mode: standalone)').matches,
-      navigatorStandalone: (window.navigator as any).standalone,
-      referrer: document.referrer,
-      isStandalone: isStandalone
-    });
-    
-    // Set PWA mode state
-    setIsPWAMode(isStandalone);
     
     // If already installed as PWA, don't show the prompt
     if (isStandalone) {
@@ -406,7 +394,7 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
-      {!showFeatures && !isPWAMode && !hasNavigatedToFeatures && <MobileOnlyPopup mobileMaxWidth={768} />}
+      <MobileOnlyPopup mobileMaxWidth={768} />
       
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="w-full h-full" style={{
@@ -520,10 +508,7 @@ const HomePage: React.FC = () => {
               
               <div className="mt-6 flex flex-col items-center">
                 <button 
-                  onClick={() => {
-                    setShowFeatures(true);
-                    setHasNavigatedToFeatures(true);
-                  }}
+                  onClick={() => setShowFeatures(true)}
                   className="text-gray-400 text-sm font-medium animate-pulse bg-white bg-opacity-5 hover:bg-opacity-10 transition-all duration-200 flex items-center px-6 py-1.5 rounded-full border border-white border-opacity-20 focus:outline-none"
                   style={{ animationDuration: "2s" }}
                 >
