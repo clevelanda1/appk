@@ -507,7 +507,7 @@ const HomePage: React.FC = () => {
               </h2>
               <p className="text-gray-400 text-md leading-relaxed mx-auto max-w-xs opacity-80">
                 Create convincing Apple Pay notifications to share with your
-                <span className="text-blue-400 mx-1 font-medium">friends & family</span>
+                <span className="text-blue-400 mx-1 font-medium">Friends & Family</span>
               </p>
               
               <div className="mt-6 flex flex-col items-center">
