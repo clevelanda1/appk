@@ -398,18 +398,10 @@ const HomePage: React.FC = () => {
       ref={containerRef}
       className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black overflow-auto"
       style={{
-        // Use custom viewport height variables for iOS/mobile
-        height: 'calc(var(--vh, 1vh) * 100)',
-        // Apply padding for top and bottom safe areas
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
         paddingRight: 'env(safe-area-inset-right, 0px)',
-        // Additional styles to ensure full coverage
-        margin: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
       }}
     >
       <MobileOnlyPopup mobileMaxWidth={768} />
@@ -425,7 +417,7 @@ const HomePage: React.FC = () => {
       <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
       
       {/* Main Hero Section */}
-      <div className={`flex-shrink-0 transition-all duration-500 ${showFeatures ? 'pb-4' : 'min-h-screen'}`}>
+      <div className={`transition-all duration-500 ${showFeatures ? 'pb-4' : 'min-h-screen flex flex-col'}`}>
         <div className="flex justify-center items-center mt-2 px-6">
           <div 
             ref={cardRef}
@@ -721,7 +713,6 @@ const HomePage: React.FC = () => {
         /* Ensure full height for all elements */
         html, body, #root {
           height: 100% !important;
-          overflow: hidden !important;
           background-color: #000 !important;
         }
       `}</style>
