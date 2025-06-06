@@ -220,8 +220,15 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     // Check if the app is already running in standalone mode (installed as PWA)
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        window.navigator.standalone || // For iOS
+                        (window.navigator as any).standalone || // For iOS
                         document.referrer.includes('android-app://');
+    
+    console.log('PWA Detection:', {
+      displayMode: window.matchMedia('(display-mode: standalone)').matches,
+      navigatorStandalone: (window.navigator as any).standalone,
+      referrer: document.referrer,
+      isStandalone: isStandalone
+    });
     
     // Set PWA mode state
     setIsPWAMode(isStandalone);
@@ -507,7 +514,7 @@ const HomePage: React.FC = () => {
               </h2>
               <p className="text-gray-400 text-md leading-relaxed mx-auto max-w-xs opacity-80">
                 Create convincing Apple Pay notifications to share with your
-                <span className="text-blue-400 mx-1 font-medium">Friends & Family</span>
+                <span className="text-blue-400 mx-1 font-medium">friends & family</span>
               </p>
               
               <div className="mt-6 flex flex-col items-center">
