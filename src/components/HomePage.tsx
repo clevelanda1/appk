@@ -219,24 +219,26 @@ const HomePage: React.FC = () => {
   
   // Check if PWA prompt should be shown (on initial load)
   useEffect(() => {
-    // Check if the app is already running in standalone mode (installed as PWA)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                        (window.navigator as any).standalone || // For iOS
-                        document.referrer.includes('android-app://');
-    
-    console.log('PWA Detection:', {
-      displayMode: window.matchMedia('(display-mode: standalone)').matches,
-      navigatorStandalone: (window.navigator as any).standalone,
-      referrer: document.referrer,
-      isStandalone: isStandalone
-    });
+    // Improved PWA detection for multiple platforms
+    const isStandalone = 
+      // Standard PWA detection
+      window.matchMedia('(display-mode: standalone)').matches ||
+      // iOS Safari PWA detection
+      (window.navigator as any).standalone === true ||
+      // Android Chrome PWA detection
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      // Additional PWA indicators
+      document.referrer.includes('android-app://') ||
+      // Check if running in app context (no browser UI)
+      window.outerHeight === window.innerHeight ||
+      // User agent check for PWA
+      /Mobile/.test(navigator.userAgent) && window.screen.height === window.innerHeight;
     
     // Set PWA mode state
     setIsPWAMode(isStandalone);
     
     // If already installed as PWA, don't show the prompt
     if (isStandalone) {
-      console.log('App is running as installed PWA, not showing prompt');
       return;
     }
     
@@ -406,8 +408,6 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
-      {!showFeatures && !isPWAMode && isInitialLoad && <MobileOnlyPopup mobileMaxWidth={768} />}
-      
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="w-full h-full" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -708,6 +708,15 @@ const HomePage: React.FC = () => {
           background-color: #000 !important;
         }
       `}</style>
+      
+      {/* Mobile Only Popup - Fixed Overlay */}
+      {!isPWAMode && isInitialLoad && (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 pointer-events-auto">
+            <MobileOnlyPopup mobileMaxWidth={768} />
+          </div>
+        </div>
+      )}
       
       {/* PWA Installation Prompt */}
       <PWAInstallPrompt
