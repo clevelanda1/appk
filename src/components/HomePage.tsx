@@ -394,7 +394,7 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
-      <MobileOnlyPopup mobileMaxWidth={768} />
+      {!showFeatures && <MobileOnlyPopup mobileMaxWidth={768} />}
       
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="w-full h-full" style={{
