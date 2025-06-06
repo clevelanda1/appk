@@ -264,7 +264,7 @@ const HomePage: React.FC = () => {
     }
   }, []);
   
-  // Add this effect to ensure that the body background matches your app's background
+  // FIXED: Updated viewport height effect to allow scrolling
   useEffect(() => {
     // Apply background color and gradient to document body
     document.documentElement.classList.add('dark-theme');
@@ -285,10 +285,20 @@ const HomePage: React.FC = () => {
     window.addEventListener('resize', setAppHeight);
     window.addEventListener('orientationchange', setAppHeight);
     
+    // FIXED: Remove the overflow hidden restrictions to allow scrolling
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    
+    // Allow scrolling
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    
     return () => {
       // Clean up when component unmounts
       document.documentElement.classList.remove('dark-theme');
       document.body.classList.remove('dark-theme');
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
       window.removeEventListener('resize', setAppHeight);
       window.removeEventListener('orientationchange', setAppHeight);
     };
@@ -386,41 +396,50 @@ const HomePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-b from-gray-900 to-black fixed inset-0 flex items-center justify-center">
+      <div className="bg-gradient-to-b from-gray-900 to-black min-h-screen flex items-center justify-center">
         <div className="text-white text-lg">Loading...</div>
       </div>
     );
   }
   
   return (
-    // Fixed positioning with inset-0 ensures full viewport coverage
+    // FIXED: Use relative positioning to allow proper scrolling
     <div 
       ref={containerRef}
-      className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black"
+      className="relative min-h-screen bg-gradient-to-b from-gray-900 to-black"
       style={{
-        height: 'calc(var(--vh, 1vh) * 100)',
-        overflowY: 'auto',
-        overflowX: 'hidden',
+        // Use custom viewport height variables for iOS/mobile
+        minHeight: showFeatures ? 'auto' : 'calc(var(--vh, 1vh) * 100)',
+        // Apply padding for safe areas
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
         paddingRight: 'env(safe-area-inset-right, 0px)',
+        // Ensure touch scrolling works on iOS
+        WebkitOverflowScrolling: 'touch',
+        // Ensure content can scroll
+        overflowY: 'auto',
       }}
     >
       <MobileOnlyPopup mobileMaxWidth={768} />
       
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
-        <div className="w-full h-full" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: '60px 60px'
-        }}></div>
-      </div>
-      
-      <div className="absolute top-0 left-1/4 w-1/2 h-80 rounded-full bg-blue-500 opacity-5 blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
+      {/* Background elements - only show on hero section */}
+      {!showFeatures && (
+        <>
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
+            <div className="w-full h-full" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              backgroundSize: '60px 60px'
+            }}></div>
+          </div>
+          
+          <div className="absolute top-0 left-1/4 w-1/2 h-80 rounded-full bg-blue-500 opacity-5 blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
+        </>
+      )}
       
       {/* Main Hero Section */}
-      <div className={`flex-shrink-0 transition-all duration-500 ${showFeatures ? 'pb-4' : 'min-h-screen'}`}>
+      <div className={`transition-all duration-500 ${showFeatures ? 'pb-4' : 'min-h-screen'}`}>
         <div className="flex justify-center items-center mt-2 px-6">
           <div 
             ref={cardRef}
@@ -526,9 +545,6 @@ const HomePage: React.FC = () => {
                   style={{ animationDuration: "2s" }}
                 >
                   Explore features
-                  {/*<svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-        </svg>*/}
                 </button>
               </div>
             </div>
@@ -545,9 +561,6 @@ const HomePage: React.FC = () => {
                 <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white to-transparent opacity-10 pointer-events-none rounded-t-full"></div>
                 <span className="relative z-10 flex items-center justify-center">
                   Get Started
-                  {/*<svg className="w-4 h-4 ml-1.5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>*/}
                 </span>
               </button>
             </div>
@@ -559,7 +572,7 @@ const HomePage: React.FC = () => {
       {showFeatures && (
         <div 
           ref={featuresRef}
-          className="flex-grow bg-gradient-to-b from-gray-50 to-white"
+          className="bg-gradient-to-b from-gray-50 to-white"
         >
           <div className="px-4 py-12">
             {/* Header Section */}
@@ -639,12 +652,6 @@ const HomePage: React.FC = () => {
               {/* Pricing Info */}
               <div className="space-y-3">
                 <div className="flex items-center justify-center space-x-6 text-sm">
-                  {/*<div className="flex items-center text-gray-600">
-                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Free to start
-                      </div>*/}
                   <div className="flex items-center text-gray-600">
                     <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
@@ -708,15 +715,49 @@ const HomePage: React.FC = () => {
           }
         }
         
-        /* Add this to fix bottom area on iOS */
-        .fixed {
-          position: fixed !important;
+        /* FIXED: Ensure scrolling works on all platforms */
+        .scroll-container {
+          overflow-y: auto !important;
+          -webkit-overflow-scrolling: touch;
+          height: auto !important;
         }
         
-        /* Ensure full height for all elements */
-        html, body, #root {
-          height: 100% !important;
-          background-color: #000 !important;
+        /* Allow scrolling on mobile devices */
+        @media (max-width: 768px) {
+          * {
+            -webkit-overflow-scrolling: touch;
+          }
+          
+          body {
+            overflow-y: auto !important;
+            height: auto !important;
+            touch-action: pan-y;
+          }
+          
+          html {
+            overflow-y: auto !important;
+            height: auto !important;
+          }
+          
+          /* Ensure scroll momentum works on iOS */
+          .scroll-container,
+          .main-container {
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+          }
+        }
+        
+        /* PWA specific fixes */
+        @media all and (display-mode: standalone) {
+          body {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+          }
+          
+          html {
+            overflow-y: auto !important;
+          }
         }
       `}</style>
       
