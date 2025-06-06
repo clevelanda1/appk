@@ -24,6 +24,7 @@ const HomePage: React.FC = () => {
   const [randomCardNumbers, setRandomCardNumbers] = useState('4852');
   const [isPWAPromptVisible, setIsPWAPromptVisible] = useState(false);
   const [showFeatures, setShowFeatures] = useState(false);
+  const [isPWAMode, setIsPWAMode] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -222,6 +223,9 @@ const HomePage: React.FC = () => {
                         window.navigator.standalone || // For iOS
                         document.referrer.includes('android-app://');
     
+    // Set PWA mode state
+    setIsPWAMode(isStandalone);
+    
     // If already installed as PWA, don't show the prompt
     if (isStandalone) {
       console.log('App is running as installed PWA, not showing prompt');
@@ -394,7 +398,7 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
-      {!showFeatures && <MobileOnlyPopup mobileMaxWidth={768} />}
+      {!showFeatures && !isPWAMode && <MobileOnlyPopup mobileMaxWidth={768} />}
       
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="w-full h-full" style={{
