@@ -720,7 +720,7 @@ const HomePage: React.FC = () => {
         }
       `}</style>
       
-      {/* Mobile Only Popup - Only show when explicitly allowed */}
+      {/* Mobile Only Popup - Clean design with lower z-index */}
       {showMobilePopup && (
         <MobileOnlyPopup mobileMaxWidth={768} />
       )}
