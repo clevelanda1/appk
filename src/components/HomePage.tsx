@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
@@ -7,6 +6,14 @@ import BankCardCycler from './BankCardCycler';
 import MobileOnlyPopup from './MobileOnlyPopup';
 import AuthCardStack from './AuthCardStack';
 import PWAInstallPrompt from './PWAInstallPrompt';
+import { 
+  CreditCard2Front, 
+  Coin, 
+  CreditCard, 
+  ArrowRepeat, 
+  PatchCheck, 
+  CardList 
+} from 'react-bootstrap-icons';
 
 const HomePage: React.FC = () => {
   const [isCardStackVisible, setIsCardStackVisible] = useState(false);
@@ -17,9 +24,11 @@ const HomePage: React.FC = () => {
   const [isThemeChanging, setIsThemeChanging] = useState(false);
   const [randomCardNumbers, setRandomCardNumbers] = useState('4852');
   const [isPWAPromptVisible, setIsPWAPromptVisible] = useState(false);
+  const [showFeatures, setShowFeatures] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
   
@@ -90,10 +99,63 @@ const HomePage: React.FC = () => {
       bankName: "First American Bank"
     }
   ];
+
+  const features = [
+    {
+      title: "Realistic Payment Interface",
+      description: "Create convincing payment screens with authentic card designs and balance displays that look just like real banking apps",
+      icon: <CreditCard2Front className="w-8 h-8" />,
+      premium: true,
+      imageUrl: "/1.png"
+    },
+    {
+      title: "Custom Payment Setup", 
+      description: "Add custom contacts, set payment amounts ($20, $50, $100, or custom), and personalize your prank experience",
+      icon: <Coin className="w-8 h-8" />,
+      premium: true,
+      imageUrl: "/2.png"
+    },
+    {
+      title: "Multiple Card Designs",
+      description: "Access exclusive card themes including Blue, Rose Gold, Emerald, and Purple designs with custom bank names", 
+      icon: <CreditCard className="w-8 h-8" />,
+      premium: true,
+      imageUrl: "/6.png"
+    },
+    {
+      title: "Processing Screen",
+      description: "Authentic loading screens with realistic timing and effects that make the prank completely convincing",
+      icon: <ArrowRepeat className="w-8 h-8" />,
+      premium: true,
+      imageUrl: "/3.png"
+    },
+    {
+      title: "Payment Confirmation Screen",
+      description: "Authentic loading screens with realistic timing and effects that make the prank completely convincing",
+      icon: <PatchCheck className="w-8 h-8" />,
+      premium: true,
+      imageUrl: "/4.png"
+    },
+    {
+      title: "Live Transaction History",
+      description: "Keep track of all your prank payments with detailed history showing received amounts and contact names",
+      icon: <CardList className="w-8 h-8" />,
+      premium: true,
+      imageUrl: "/5.png"
+    }
+  ];
   
   const { isSwiping } = useSwipeGesture(containerRef, {
-    onSwipeUp: () => setIsCardStackVisible(true),
-    onSwipeDown: () => setIsCardStackVisible(false),
+    onSwipeUp: () => {
+      if (!showFeatures) {
+        setShowFeatures(true);
+      }
+    },
+    onSwipeDown: () => {
+      if (showFeatures) {
+        setShowFeatures(false);
+      }
+    },
   });
   
   useEffect(() => {
@@ -334,7 +396,7 @@ const HomePage: React.FC = () => {
     // Fixed positioning with inset-0 ensures full viewport coverage
     <div 
       ref={containerRef}
-      className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black overflow-hidden"
+      className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black overflow-auto"
       style={{
         // Use custom viewport height variables for iOS/mobile
         height: 'calc(var(--vh, 1vh) * 100)',
@@ -362,140 +424,259 @@ const HomePage: React.FC = () => {
       <div className="absolute top-0 left-1/4 w-1/2 h-80 rounded-full bg-blue-500 opacity-5 blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
       
-      <div className="flex justify-center items-center mt-2 px-6">
-        <div 
-          ref={cardRef}
-          className={`chase-card w-full max-w-sm rounded-xl overflow-hidden shadow-lg transform transition-all duration-500 ${
-            isThemeChanging ? 'scale-95 opacity-80' : 'hover:scale-[1.02]'
-          }`} 
-          style={{
-            background: currentTheme.background,
-            height: '14rem',
-            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.05) inset',
-            position: 'relative',
-            transition: 'all 0.5s ease',
-          }}
-        >
-          {currentTheme.shine && (
-            <div 
-              className="absolute inset-0 opacity-20 pointer-events-none transition-opacity duration-500"
-              style={{
-                background: `radial-gradient(circle at ${shinePosition.x} ${shinePosition.y}, rgba(255, 255, 255, 0.8), transparent 60%)`,
-                mixBlendMode: 'overlay',
-              }}
-            ></div>
-          )}
-          
-          {currentTheme.rainbow && (
-            <div 
-              className="rainbow-effect absolute inset-0 opacity-10 pointer-events-none overflow-hidden transition-opacity duration-500"
-              style={{
-                background: 'linear-gradient(45deg, rgba(255,0,0,0), rgba(255,0,0,0.5), rgba(0,255,0,0.5), rgba(0,0,255,0.5), rgba(255,0,0,0))',
-                backgroundSize: '400% 400%',
-                animation: 'rainbowShift 5s ease infinite',
-                filter: 'blur(20px)',
-              }}
-            ></div>
-          )}
-          
+      {/* Main Hero Section */}
+      <div className={`flex-shrink-0 transition-all duration-500 ${showFeatures ? 'pb-4' : 'min-h-screen'}`}>
+        <div className="flex justify-center items-center mt-2 px-6">
           <div 
-            className="pattern-overlay absolute inset-0 bg-repeat opacity-15 transition-all duration-500" 
+            ref={cardRef}
+            className={`chase-card w-full max-w-sm rounded-xl overflow-hidden shadow-lg transform transition-all duration-500 ${
+              isThemeChanging ? 'scale-95 opacity-80' : 'hover:scale-[1.02]'
+            }`} 
             style={{
-              backgroundImage: currentTheme.pattern,
-              backgroundSize: '20px 20px',
+              background: currentTheme.background,
+              height: '14rem',
+              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.05) inset',
+              position: 'relative',
+              transition: 'all 0.5s ease',
             }}
-          ></div>
-          
-          <div 
-            className="border-accent absolute top-0 left-0 right-0 h-[1px] opacity-40 transition-all duration-500"
-            style={{ 
-              background: `linear-gradient(to right, transparent, ${currentTheme.borderAccent}, transparent)` 
-            }}
-          ></div>
-          
-          <div className="absolute inset-0 flex items-center justify-center">
-            <h1 className="text-white text-4xl font-bold tracking-tight drop-shadow-md">
-              Apple Pay Prank
-            </h1>
-          </div>
-          
-          <div className="p-6 flex flex-col h-full relative z-10">
-            <div className="flex justify-between">
-              <div className="text-white text-xl font-medium flex items-center">
-                {currentTheme.bankName}
-                <span className="ml-1 text-xs align-top relative -top-1.5">®</span>
-              </div>
+          >
+            {currentTheme.shine && (
+              <div 
+                className="absolute inset-0 opacity-20 pointer-events-none transition-opacity duration-500"
+                style={{
+                  background: `radial-gradient(circle at ${shinePosition.x} ${shinePosition.y}, rgba(255, 255, 255, 0.8), transparent 60%)`,
+                  mixBlendMode: 'overlay',
+                }}
+              ></div>
+            )}
+            
+            {currentTheme.rainbow && (
+              <div 
+                className="rainbow-effect absolute inset-0 opacity-10 pointer-events-none overflow-hidden transition-opacity duration-500"
+                style={{
+                  background: 'linear-gradient(45deg, rgba(255,0,0,0), rgba(255,0,0,0.5), rgba(0,255,0,0.5), rgba(0,0,255,0.5), rgba(255,0,0,0))',
+                  backgroundSize: '400% 400%',
+                  animation: 'rainbowShift 5s ease infinite',
+                  filter: 'blur(20px)',
+                }}
+              ></div>
+            )}
+            
+            <div 
+              className="pattern-overlay absolute inset-0 bg-repeat opacity-15 transition-all duration-500" 
+              style={{
+                backgroundImage: currentTheme.pattern,
+                backgroundSize: '20px 20px',
+              }}
+            ></div>
+            
+            <div 
+              className="border-accent absolute top-0 left-0 right-0 h-[1px] opacity-40 transition-all duration-500"
+              style={{ 
+                background: `linear-gradient(to right, transparent, ${currentTheme.borderAccent}, transparent)` 
+              }}
+            ></div>
+            
+            <div className="absolute inset-0 flex items-center justify-center">
+              <h1 className="text-white text-4xl font-bold tracking-tight drop-shadow-md">
+                Apple Pay Prank
+              </h1>
             </div>
             
-            <div className="flex-grow"></div>
-            
-            <div>
-              <div className="flex justify-end mb-1">
-                <div className="text-white text-xs font-medium tracking-wide opacity-90"
-                     style={{ textShadow: '0 0.5px 1px rgba(0, 0, 0, 0.3)' }}>DEBIT</div>
+            <div className="p-6 flex flex-col h-full relative z-10">
+              <div className="flex justify-between">
+                <div className="text-white text-xl font-medium flex items-center">
+                  {currentTheme.bankName}
+                  <span className="ml-1 text-xs align-top relative -top-1.5">®</span>
+                </div>
               </div>
               
-              <div className="flex justify-between items-center">
-                <div className="text-white text-sm tracking-widest opacity-90 font-medium"
-                     style={{ textShadow: '0 0.5px 1px rgba(0, 0, 0, 0.3)' }}>•••• {randomCardNumbers}</div>
-                <div className="text-white text-2xl font-bold italic tracking-wider"
-                     style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)' }}>VISA</div>
+              <div className="flex-grow"></div>
+              
+              <div>
+                <div className="flex justify-end mb-1">
+                  <div className="text-white text-xs font-medium tracking-wide opacity-90"
+                       style={{ textShadow: '0 0.5px 1px rgba(0, 0, 0, 0.3)' }}>DEBIT</div>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="text-white text-sm tracking-widest opacity-90 font-medium"
+                       style={{ textShadow: '0 0.5px 1px rgba(0, 0, 0, 0.3)' }}>•••• {randomCardNumbers}</div>
+                  <div className="text-white text-2xl font-bold italic tracking-wider"
+                       style={{ textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)' }}>VISA</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      {!isCardStackVisible && (
-        <>
-          <div className="px-8 mt-2 text-center">
-            <h2 className="text-white text-xl font-semibold mb-3">
-              <span className="relative inline-block">
-                <span className="relative z-10"></span>
-                <div className="absolute bottom-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-30"></div>
-              </span>
-            </h2>
-            <p className="text-gray-400 text-md leading-relaxed mx-auto max-w-xs opacity-80">
-              Create convincing Apple Pay notifications to share with your
-              <span className="text-blue-400 mx-1 font-medium">friends & family</span>
-            </p>
-            
-            <div className="mt-6 flex flex-col items-center">
-              <p className="text-gray-400 text-sm font-medium mb-1.5 animate-pulse"
-                style={{ animationDuration: "2s" }}
-                >Swipe up to continue</p>
+        
+        {!showFeatures && (
+          <>
+            <div className="px-8 mt-2 text-center">
+              <h2 className="text-white text-xl font-semibold mb-3">
+                <span className="relative inline-block">
+                  <span className="relative z-10"></span>
+                  <div className="absolute bottom-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-30"></div>
+                </span>
+              </h2>
+              <p className="text-gray-400 text-md leading-relaxed mx-auto max-w-xs opacity-80">
+                Create convincing Apple Pay notifications to share with your
+                <span className="text-blue-400 mx-1 font-medium">friends & family</span>
+              </p>
               
+              <div className="mt-6 flex flex-col items-center">
+                <button 
+                  onClick={() => setShowFeatures(true)}
+                  className="text-gray-400 text-sm font-medium animate-pulse bg-white bg-opacity-5 hover:bg-opacity-10 transition-all duration-200 flex items-center px-6 py-1.5 rounded-full border border-white border-opacity-20 focus:outline-none"
+                  style={{ animationDuration: "2s" }}
+                >
+                  Explore features
+                  {/*<svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+        </svg>*/}
+                </button>
+              </div>
+            </div>
+            
+            <div className="absolute bottom-24 w-full flex flex-col items-center px-6">
+              <button 
+                onClick={handleGetStarted}
+                className="group relative w-48 text-white py-3.5 text-base font-medium focus:outline-none active:opacity-90 transition-all duration-200 rounded-full overflow-hidden"
+                style={{
+                  background: 'linear-gradient(to right, #0A84FF, #0070E0)',
+                  boxShadow: '0 2px 8px rgba(10, 132, 255, 0.3), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white to-transparent opacity-10 pointer-events-none rounded-t-full"></div>
+                <span className="relative z-10 flex items-center justify-center">
+                  Get Started
+                  {/*<svg className="w-4 h-4 ml-1.5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+              </svg>*/}
+                </span>
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Features Section */}
+      {showFeatures && (
+        <div 
+          ref={featuresRef}
+          className="flex-grow bg-gradient-to-b from-gray-50 to-white"
+        >
+          <div className="px-4 py-12">
+            {/* Header Section */}
+            <div className="text-center mb-12">
+              <h2 className="text-gray-900 text-3xl font-semibold mb-3 tracking-tight">
+                Everything you need for the perfect prank
+              </h2>
+              <p className="text-gray-600 text-lg font-normal max-w-md mx-auto leading-relaxed">
+                Powerful features designed to create the most convincing payment experience.
+              </p>
+            </div>
+            
+            {/* Features Grid */}
+            <div className="space-y-8 max-w-sm mx-auto">
+              {features.map((feature, index) => (
+                <div 
+                  key={index}
+                  className="group bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 ease-out"
+                  style={{
+                    animationDelay: `${index * 150}ms`,
+                    animation: showFeatures ? 'fadeInUp 0.8s ease-out forwards' : 'none',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 8px rgba(0, 0, 0, 0.02)'
+                  }}
+                >
+                  {/* Image Section */}
+                  <div className="relative bg-gray-50 overflow-hidden">
+                    <img 
+                      src={feature.imageUrl} 
+                      alt={`${feature.title} Screenshot`}
+                      className="w-full h-[800px] object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
+                    {feature.premium && (
+                      <div className="absolute top-4 right-4">
+                        {/*<div className="bg-black bg-opacity-80 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                          Preminum
+                    </div>*/}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Content Section */}
+                  <div className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className={`p-2.5 rounded-xl ${
+                          feature.premium 
+                            ? 'bg-blue-50 text-blue-600' 
+                            : 'bg-gray-50 text-gray-600'
+                        }`}>
+                          {feature.icon}
+                        </div>
+                      </div>
+                      
+                      <div className="flex-grow min-w-0">
+                        <h3 className="text-gray-900 font-semibold text-lg mb-2 leading-tight">
+                          {feature.title}
+                        </h3>
+                        <p className="text-gray-600 text-base leading-relaxed font-normal">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Call to Action Section */}
+            <div className="mt-16 text-center space-y-6">
+              <button 
+                onClick={handleSignUp}
+                className="w-full max-w-sm mx-auto block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-4 px-6 rounded-3xl transition-all duration-200 font-semibold focus:outline-none text-base shadow-sm hover:shadow-md"
+              >
+                Sign Up
+              </button>
+              
+              {/* Pricing Info */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-center space-x-6 text-sm">
+                  {/*<div className="flex items-center text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Free to start
+                      </div>*/}
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    $2.99 lifetime premium
+                  </div>
+                </div>
+                
+                <p className="text-gray-500 text-sm font-normal">
+                  No subscription required. Pay once, prank forever.
+                </p>
+              </div>
+              
+              {/* Back to Top */}
+              <button 
+                onClick={() => setShowFeatures(false)}
+                className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors duration-200 text-base font-medium mt-8"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+                Back to top
+              </button>
             </div>
           </div>
-          
-          <div className="absolute bottom-24 w-full flex flex-col items-center px-6">
-            <button 
-              onClick={handleGetStarted}
-              className="group relative w-48 text-white py-3.5 text-base font-medium focus:outline-none active:opacity-90 transition-all duration-200 rounded-full overflow-hidden"
-              style={{
-                background: 'linear-gradient(to right, #0A84FF, #0070E0)',
-                boxShadow: '0 2px 8px rgba(10, 132, 255, 0.3), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.2)'
-              }}
-            >
-              <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white to-transparent opacity-10 pointer-events-none rounded-t-full"></div>
-              <span className="relative z-10 flex items-center justify-center">
-                Get Started
-                <svg className="w-4 h-4 ml-1.5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </span>
-            </button>
-          </div>
-        </>
+        </div>
       )}
-      
-      {/*<div className="absolute bottom-2 w-full flex flex-col items-center space-y-3" 
-          style={{ 
-            marginBottom: 'env(safe-area-inset-bottom, 0px)',
-            paddingBottom: '0px' // Add extra padding at the bottom
-          }}>
-        <p className="text-gray-500 text-xs font-medium">Apple Pay Prank v1.0</p>
-        </div>*/}
       
       <style jsx>{`
         @keyframes shineEffect {
@@ -521,6 +702,17 @@ const HomePage: React.FC = () => {
           100% { opacity: 0; }
         }
         
+        @keyframes fadeInUp {
+          0% { 
+            opacity: 0; 
+            transform: translateY(20px); 
+          }
+          100% { 
+            opacity: 1; 
+            transform: translateY(0); 
+          }
+        }
+        
         /* Add this to fix bottom area on iOS */
         .fixed {
           position: fixed !important;
@@ -533,13 +725,6 @@ const HomePage: React.FC = () => {
           background-color: #000 !important;
         }
       `}</style>
-      
-      <AuthCardStack 
-        isVisible={isCardStackVisible} 
-        onClose={() => setIsCardStackVisible(false)}
-        onSignIn={handleSignIn}
-        onSignUp={handleSignUp}
-      />
       
       {/* PWA Installation Prompt */}
       <PWAInstallPrompt
