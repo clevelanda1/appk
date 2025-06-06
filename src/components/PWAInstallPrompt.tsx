@@ -13,6 +13,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 }) => {
   const [platform, setPlatform] = useState<'ios' | 'android' | 'other'>('other');
   const [isMobile, setIsMobile] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   
   useEffect(() => {
     // Detect platform and if mobile
@@ -28,7 +29,45 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
     } else {
       setPlatform('other');
     }
+
+    // Listen for the beforeinstallprompt event (Android Chrome)
+    const handleBeforeInstallPrompt = (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Save the event so it can be triggered later
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (platform === 'android' && deferredPrompt) {
+      // Show the native install prompt on Android
+      deferredPrompt.prompt();
+      
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        onClose(); // Close our custom prompt
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      
+      // Clear the deferredPrompt so it can only be used once
+      setDeferredPrompt(null);
+    } else {
+      // For iOS or when native prompt isn't available, just close
+      // The instructions are already shown to guide the user
+      onClose();
+    }
+  };
   
   // In production, uncomment this to only show on mobile
   if (!isMobile) {
@@ -109,13 +148,13 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             {/* Action Buttons */}
             <div className="space-y-3">
               <button
-                onClick={onClose}
+                onClick={handleInstallClick}
                 className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
                 style={{
                   boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
                 }}
               >
-                Install App
+                {platform === 'android' && deferredPrompt ? 'Install App' : 'Got It!'}
               </button>
               
               <button
