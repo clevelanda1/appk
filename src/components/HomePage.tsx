@@ -396,8 +396,11 @@ const HomePage: React.FC = () => {
     // Fixed positioning with inset-0 ensures full viewport coverage
     <div 
       ref={containerRef}
-      className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black overflow-auto"
+      className="fixed inset-0 bg-gradient-to-b from-gray-900 to-black"
       style={{
+        height: 'calc(var(--vh, 1vh) * 100)',
+        overflowY: 'auto',
+        overflowX: 'hidden',
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         paddingLeft: 'env(safe-area-inset-left, 0px)',
@@ -417,7 +420,7 @@ const HomePage: React.FC = () => {
       <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500 opacity-5 blur-3xl pointer-events-none"></div>
       
       {/* Main Hero Section */}
-      <div className={`transition-all duration-500 ${showFeatures ? 'pb-4' : 'min-h-screen flex flex-col'}`}>
+      <div className={`flex-shrink-0 transition-all duration-500 ${showFeatures ? 'pb-4' : 'min-h-screen'}`}>
         <div className="flex justify-center items-center mt-2 px-6">
           <div 
             ref={cardRef}
