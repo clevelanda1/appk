@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { useAuth } from '../hooks/useAuth';
 import BankCardCycler from './BankCardCycler';
 import MobileOnlyPopup from './MobileOnlyPopup';
@@ -144,19 +143,6 @@ const HomePage: React.FC = () => {
       imageUrl: "/5.png"
     }
   ];
-  
-  const { isSwiping } = useSwipeGesture(containerRef, {
-    onSwipeUp: () => {
-      if (!showFeatures) {
-        setShowFeatures(true);
-      }
-    },
-    onSwipeDown: () => {
-      if (showFeatures) {
-        setShowFeatures(false);
-      }
-    },
-  });
   
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -715,48 +701,41 @@ const HomePage: React.FC = () => {
           }
         }
         
-        /* FIXED: Ensure scrolling works on all platforms */
-        .scroll-container {
+        /* FIXED: Simplified scrolling without swipe gesture conflicts */
+        body {
           overflow-y: auto !important;
-          -webkit-overflow-scrolling: touch;
-          height: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+          touch-action: pan-y !important;
         }
         
-        /* Allow scrolling on mobile devices */
+        html {
+          overflow-y: auto !important;
+        }
+        
+        /* Mobile optimizations */
         @media (max-width: 768px) {
           * {
             -webkit-overflow-scrolling: touch;
           }
           
           body {
-            overflow-y: auto !important;
             height: auto !important;
-            touch-action: pan-y;
-          }
-          
-          html {
-            overflow-y: auto !important;
-            height: auto !important;
-          }
-          
-          /* Ensure scroll momentum works on iOS */
-          .scroll-container,
-          .main-container {
-            -webkit-overflow-scrolling: touch;
-            overflow-y: auto;
+            touch-action: pan-y !important;
           }
         }
         
         /* PWA specific fixes */
         @media all and (display-mode: standalone) {
           body {
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
           }
-          
-          html {
-            overflow-y: auto !important;
+        }
+        
+        /* Force scroll behavior for mobile Safari */
+        @supports (-webkit-appearance: none) {
+          body {
+            -webkit-overflow-scrolling: touch !important;
           }
         }
       `}</style>
