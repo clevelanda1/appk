@@ -38,106 +38,118 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   const renderInstructions = () => {
     if (platform === 'ios') {
       return (
-        <div className="mt-2">
-          <p className="text-gray-300 mb-4">
-            <span className="font-medium text-white">Step 1:</span> Click the
-            <span className="bg-gray-700 rounded px-2 py-0.5 mx-1 text-sm">Share</span>
-            option in your browser window
-          </p>
-          <p className="text-gray-300">
-            <span className="font-medium text-white">Step 2:</span> Click 
-            <span className="bg-gray-700 rounded px-2 py-0.5 mx-1 text-sm">Add to Home Screen</span>
-            to add an app to your device
-          </p>
+        <div className="space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+              1
+            </div>
+            <p className="text-gray-600 text-base leading-relaxed">
+              Tap the <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Share</span> button in Safari
+            </p>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+              2
+            </div>
+            <p className="text-gray-600 text-base leading-relaxed">
+              Select <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Add to Home Screen</span> from the menu
+            </p>
+          </div>
         </div>
       );
     } else if (platform === 'android') {
       return (
-        <div className="mt-2">
-          <p className="text-gray-300 mb-4">
-            <span className="font-medium text-white">Step 1:</span> Click the menu option in your browser window
-          </p>
-          <p className="text-gray-300">
-            <span className="font-medium text-white">Step 2:</span> Click 
-            <span className="bg-gray-700 rounded px-2 py-0.5 mx-1 text-sm">Add to Home Screen</span>
-            to add an app to your device
-          </p>
+        <div className="space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+              1
+            </div>
+            <p className="text-gray-600 text-base leading-relaxed">
+              Tap the menu (⋮) button in your browser
+            </p>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+              2
+            </div>
+            <p className="text-gray-600 text-base leading-relaxed">
+              Select <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Add to Home Screen</span> from the menu
+            </p>
+          </div>
         </div>
       );
     } else {
-      // For all other mobile browsers, give a generic instruction
       return (
-        <div className="mt-2">
-          <p className="text-gray-300 mb-4">
-            <span className="font-medium text-white">Step 1:</span> Click the
-            <span className="bg-gray-700 rounded px-2 py-0.5 mx-1 text-sm">Share</span>
-            option in your browser window
-          </p>
-          <p className="text-gray-300">
-            <span className="font-medium text-white">Step 2:</span> Click 
-            <span className="bg-gray-700 rounded px-2 py-0.5 mx-1 text-sm">Add to Home Screen</span>
-            to add an app to your device
-          </p>
+        <div className="space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+              1
+            </div>
+            <p className="text-gray-600 text-base leading-relaxed">
+              Tap the <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Share</span> button in your browser
+            </p>
+          </div>
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
+              2
+            </div>
+            <p className="text-gray-600 text-base leading-relaxed">
+              Select <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Add to Home Screen</span> from the menu
+            </p>
+          </div>
         </div>
       );
     }
   };
 
-  const buttonBgColor = "bg-gray-800/80";
-
   return (
     <div
-      className={`absolute inset-x-0 bottom-0 bg-[#121418] rounded-t-3xl transform transition-all duration-300 ease-in-out ${
+      className={`fixed bottom-0 left-0 right-0 z-50 transform transition-all duration-300 ease-in-out ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
-      style={{
-        height: 'auto',
-        boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.3)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        zIndex: 50,
-      }}
     >
-      <div className="w-full flex justify-center py-3">
-        <div className="w-32 h-1 bg-gray-600 rounded-full opacity-0"></div>
-      </div>
-
-      <div className="px-6 pb-1">
-        <div className="text-center mb-2">
-          <h2 className="text-white text-xl font-bold">Native Mobile App</h2>
-          <p className="text-gray-400 text-sm mt-1">Designed to feel natural as an app.</p>
+      <div className="bg-white rounded-t-3xl shadow-lg border-t border-gray-100 mx-4 mb-4">
+        {/* Handle bar */}
+        <div className="w-full flex justify-center py-3">
+          <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
         </div>
 
-        <div className="py-5">
-          <div className="rounded-2xl overflow-hidden mb-6 bg-gray-800/60 border border-gray-700/30">
-            <div className="bg-blue-500 py-3 px-3 text-white font-semibold tracking-wide text-center text-sm">
-              QUICK SETUP GUIDE
+        <div className="px-6 pb-6">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-gray-900 text-xl font-semibold">Native Mobile App</h2>
+              <p className="text-gray-600 text-base mt-1">Designed to feel natural as an app.</p>
+            </div>
+            <button 
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors p-2 rounded-full hover:bg-gray-100"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+          </div>
+
+          {/* Instructions Card */}
+          <div className="bg-gray-50 rounded-2xl p-6 mb-6">
+            <div className="text-center mb-4">
+              <h3 className="text-gray-900 font-semibold text-lg mb-2">Quick Setup Guide</h3>
+              <p className="text-gray-600 text-sm">Install this app on your device for the best experience</p>
             </div>
             
-            <div className="p-5">
-              <div className="bg-blue-500/10 rounded-lg p-4 mb-0">
-                {renderInstructions()}
-              </div>
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+              {renderInstructions()}
             </div>
           </div>
 
-          <div className="space-y-3">
-            <button
-              onClick={onClose}
-              className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-3.5 px-4 rounded-2xl transition-colors duration-200 font-medium focus:outline-none text-base"
-              style={{ boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)' }}
-            >
-              Got It!
-            </button>
-            
-            {/*<button
-              onClick={onDismiss}
-              className={`w-full ${buttonBgColor} text-white py-3.5 px-4 rounded-2xl font-medium focus:outline-none text-sm`}
-              style={{ boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)' }}
-            >
-              Do not show this again
-            </button>*/}
-          </div>
+          {/* Action Button */}
+          <button
+            onClick={onClose}
+            className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-4 px-6 rounded-2xl transition-all duration-200 font-semibold focus:outline-none text-base shadow-sm hover:shadow-md"
+          >
+            Got It!
+          </button>
         </div>
       </div>
     </div>
