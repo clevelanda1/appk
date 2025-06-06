@@ -26,6 +26,7 @@ const HomePage: React.FC = () => {
   const [showFeatures, setShowFeatures] = useState(false);
   const [isPWAMode, setIsPWAMode] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [showMobilePopup, setShowMobilePopup] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -236,6 +237,15 @@ const HomePage: React.FC = () => {
     
     // Set PWA mode state
     setIsPWAMode(isStandalone);
+    
+    // Only show mobile popup if NOT in PWA mode and on initial load
+    if (!isStandalone && isInitialLoad) {
+      // Small delay to ensure page is loaded
+      const timer = setTimeout(() => {
+        setShowMobilePopup(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
     
     // If already installed as PWA, don't show the prompt
     if (isStandalone) {
@@ -523,6 +533,7 @@ const HomePage: React.FC = () => {
                   onClick={() => {
                     setShowFeatures(true);
                     setIsInitialLoad(false);
+                    setShowMobilePopup(false);
                   }}
                   className="text-gray-400 text-sm font-medium animate-pulse bg-white bg-opacity-5 hover:bg-opacity-10 transition-all duration-200 flex items-center px-6 py-1.5 rounded-full border border-white border-opacity-20 focus:outline-none"
                   style={{ animationDuration: "2s" }}
@@ -709,13 +720,9 @@ const HomePage: React.FC = () => {
         }
       `}</style>
       
-      {/* Mobile Only Popup - Fixed Overlay */}
-      {!isPWAMode && isInitialLoad && (
-        <div className="fixed inset-0 z-50 pointer-events-none">
-          <div className="absolute bottom-0 left-0 right-0 pointer-events-auto">
-            <MobileOnlyPopup mobileMaxWidth={768} />
-          </div>
-        </div>
+      {/* Mobile Only Popup - Only show when explicitly allowed */}
+      {showMobilePopup && (
+        <MobileOnlyPopup mobileMaxWidth={768} />
       )}
       
       {/* PWA Installation Prompt */}
