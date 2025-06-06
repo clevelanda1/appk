@@ -34,125 +34,101 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   if (!isMobile) {
     return null;
   }
-  
-  const renderInstructions = () => {
-    if (platform === 'ios') {
-      return (
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-              1
-            </div>
-            <p className="text-gray-600 text-base leading-relaxed">
-              Tap the <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Share</span> button in Safari
-            </p>
-          </div>
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-              2
-            </div>
-            <p className="text-gray-600 text-base leading-relaxed">
-              Select <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Add to Home Screen</span> from the menu
-            </p>
-          </div>
-        </div>
-      );
-    } else if (platform === 'android') {
-      return (
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-              1
-            </div>
-            <p className="text-gray-600 text-base leading-relaxed">
-              Tap the menu (⋮) button in your browser
-            </p>
-          </div>
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-              2
-            </div>
-            <p className="text-gray-600 text-base leading-relaxed">
-              Select <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Add to Home Screen</span> from the menu
-            </p>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-              1
-            </div>
-            <p className="text-gray-600 text-base leading-relaxed">
-              Tap the <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Share</span> button in your browser
-            </p>
-          </div>
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">
-              2
-            </div>
-            <p className="text-gray-600 text-base leading-relaxed">
-              Select <span className="inline-flex items-center bg-gray-100 rounded-md px-2 py-1 text-sm font-medium text-gray-900 mx-1">Add to Home Screen</span> from the menu
-            </p>
-          </div>
-        </div>
-      );
-    }
-  };
 
   return (
-    <div
-      className={`fixed bottom-0 left-0 right-0 z-50 transform transition-all duration-300 ease-in-out ${
-        isVisible ? 'translate-y-0' : 'translate-y-full'
-      }`}
-    >
-      <div className="bg-white rounded-t-3xl shadow-lg border-t border-gray-100 mx-4 mb-4">
-        {/* Handle bar */}
-        <div className="w-full flex justify-center py-3">
-          <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
-        </div>
-
-        <div className="px-6 pb-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-gray-900 text-xl font-semibold">Native Mobile App</h2>
-              <p className="text-gray-600 text-base mt-1">Designed to feel natural as an app.</p>
-            </div>
-            <button 
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors p-2 rounded-full hover:bg-gray-100"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-50 transition-all duration-300 ${
+          isVisible ? 'bg-black bg-opacity-50' : 'bg-transparent pointer-events-none'
+        }`}
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none transition-all duration-300 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div
+          className={`bg-white rounded-3xl shadow-2xl w-full max-w-sm transform transition-all duration-300 pointer-events-auto ${
+            isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
+          }`}
+          style={{
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+          }}
+        >
+          {/* App Icon and Header */}
+          <div className="text-center pt-8 pb-4 px-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
+              <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H11V21H5V19H11V17H5V15H11V13H5V11H11V9H5V7H5V5H13V9H21ZM15 15V13H17V11H19V13H21V15H19V17H17V15H15Z"/>
               </svg>
-            </button>
+            </div>
+            <h2 className="text-gray-900 text-lg font-semibold mb-2">Add "Apple Pay Prank" to Home Screen?</h2>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Install this app on your home screen for quick and easy access when you're on the go.
+            </p>
           </div>
 
-          {/* Instructions Card */}
-          <div className="bg-gray-50 rounded-2xl p-6 mb-6">
-            <div className="text-center mb-4">
-              <h3 className="text-gray-900 font-semibold text-lg mb-2">Quick Setup Guide</h3>
-              <p className="text-gray-600 text-sm">Install this app on your device for the best experience</p>
+          {/* Instructions */}
+          <div className="px-6 pb-6">
+            <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+              {platform === 'ios' ? (
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M15 10a.75.75 0 01-.75.75H7.612l2.158 1.96a.75.75 0 11-1.04 1.08l-3.5-3.25a.75.75 0 010-1.08l3.5-3.25a.75.75 0 111.04 1.08L7.612 9.25h6.638A.75.75 0 0115 10z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-gray-900 text-sm font-medium">Tap the Share button</p>
+                    <p className="text-gray-600 text-xs">Then choose "Add to Home Screen"</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-gray-900 text-sm font-medium">Tap the menu button</p>
+                    <p className="text-gray-600 text-xs">Then choose "Add to Home Screen"</p>
+                  </div>
+                </div>
+              )}
             </div>
-            
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-              {renderInstructions()}
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <button
+                onClick={onClose}
+                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
+                style={{
+                  boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
+                }}
+              >
+                Install App
+              </button>
+              
+              <button
+                onClick={onDismiss}
+                className="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 py-3.5 px-4 rounded-xl transition-all duration-200 font-medium focus:outline-none text-base"
+              >
+                Not Now
+              </button>
             </div>
           </div>
-
-          {/* Action Button */}
-          <button
-            onClick={onClose}
-            className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-4 px-6 rounded-2xl transition-all duration-200 font-semibold focus:outline-none text-base shadow-sm hover:shadow-md"
-          >
-            Got It!
-          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
