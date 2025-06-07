@@ -238,28 +238,41 @@ const HomePage: React.FC = () => {
     // Set PWA mode state
     setIsPWAMode(isStandalone);
     
-    // Check if the user is on a mobile device
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent || navigator.vendor
-    );
-    
-    // Show mobile popup if NOT in PWA mode and on initial load
-    if (!isStandalone && isInitialLoad && isMobileDevice) {
+    // Only show mobile popup if NOT in PWA mode and on initial load
+    if (!isStandalone && isInitialLoad) {
+      // Small delay to ensure page is loaded
       const timer = setTimeout(() => {
         setShowMobilePopup(true);
       }, 500);
       return () => clearTimeout(timer);
     }
     
-    // Show PWA prompt on every refresh if mobile and not PWA
-    if (!isStandalone && isMobileDevice) {
-      const pwaTimer = setTimeout(() => {
-        setIsPWAPromptVisible(true);
-      }, 2000); // Increased delay to avoid conflicts
-      
-      return () => clearTimeout(pwaTimer);
+    // If already installed as PWA, don't show the prompt
+    if (isStandalone) {
+      return;
     }
-  }, [isInitialLoad]);
+    
+    const hasSeenPWAPrompt = localStorage.getItem('hasSeenPWAPrompt') === 'true';
+    
+    // Check if the user is on a mobile device
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent || navigator.vendor
+    );
+    
+    // Only show the prompt if:
+    // 1. It hasn't been dismissed before
+    // 2. User is on a mobile device
+    // 3. The app is not already installed as PWA
+    if (!hasSeenPWAPrompt && isMobileDevice && !isStandalone) {
+      // Show the prompt after a short delay to allow page to load
+      const timer = setTimeout(() => {
+        console.log('Setting PWA prompt visible');
+        setIsPWAPromptVisible(true);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
   
   // Add this effect to ensure that the body background matches your app's background
   useEffect(() => {
@@ -340,7 +353,8 @@ const HomePage: React.FC = () => {
   };
   
   const handleDismissPWAPrompt = () => {
-    // Just close the prompt, don't save to localStorage so it shows on refresh
+    // Save to localStorage so the prompt doesn't show again
+    localStorage.setItem('hasSeenPWAPrompt', 'true');
     setIsPWAPromptVisible(false);
   };
   
@@ -404,9 +418,6 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
-      {/* Mobile Only Popup - Conditionally rendered */}
-      {showMobilePopup && <MobileOnlyPopup mobileMaxWidth={768} />}
-      
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="w-full h-full" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -520,10 +531,9 @@ const HomePage: React.FC = () => {
               <div className="mt-6 flex flex-col items-center">
                 <button 
                   onClick={() => {
-                    console.log('Explore features clicked, current showFeatures:', showFeatures);
                     setShowFeatures(true);
+                    setIsInitialLoad(false);
                     setShowMobilePopup(false);
-                    console.log('Set showFeatures to true');
                   }}
                   className="text-gray-400 text-sm font-medium animate-pulse bg-white bg-opacity-5 hover:bg-opacity-10 transition-all duration-200 flex items-center px-6 py-1.5 rounded-full border border-white border-opacity-20 focus:outline-none"
                   style={{ animationDuration: "2s" }}
@@ -709,6 +719,11 @@ const HomePage: React.FC = () => {
           background-color: #000 !important;
         }
       `}</style>
+      
+      {/* Mobile Only Popup - Clean design with lower z-index */}
+      {showMobilePopup && (
+        <MobileOnlyPopup mobileMaxWidth={768} />
+      )}
       
       {/* PWA Installation Prompt */}
       <PWAInstallPrompt
