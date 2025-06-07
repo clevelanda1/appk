@@ -255,7 +255,7 @@ const HomePage: React.FC = () => {
     if (!isStandalone && isMobileDevice) {
       const pwaTimer = setTimeout(() => {
         setIsPWAPromptVisible(true);
-      }, 2000); // Increased delay to avoid conflicts
+      }, 500); // Increased delay to avoid conflicts
       
       return () => clearTimeout(pwaTimer);
     }
