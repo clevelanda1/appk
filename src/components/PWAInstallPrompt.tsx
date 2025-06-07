@@ -109,7 +109,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
               <img 
                 src="/logo.png" 
                 alt="Logo" 
-                className="w-13 h-13 rounded-xl object-cover"
+                className="w-16 h-16 rounded-xl object-cover"
               />
             </div>
             <h2 className="text-gray-900 text-lg font-semibold mb-2">Get the Full Experience</h2>
