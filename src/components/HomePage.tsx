@@ -27,9 +27,6 @@ const HomePage: React.FC = () => {
   const [isPWAMode, setIsPWAMode] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [showMobilePopup, setShowMobilePopup] = useState(false);
-  const [isPWAMode, setIsPWAMode] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [showMobilePopup, setShowMobilePopup] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -409,6 +406,9 @@ const HomePage: React.FC = () => {
         position: 'relative',
       }}
     >
+      {/* Mobile Only Popup - Conditionally rendered */}
+      {showMobilePopup && <MobileOnlyPopup mobileMaxWidth={768} />}
+      
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div className="w-full h-full" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.2'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -710,11 +710,6 @@ const HomePage: React.FC = () => {
           background-color: #000 !important;
         }
       `}</style>
-      
-      {/* Mobile Only Popup - Clean design with lower z-index */}
-      {showMobilePopup && (
-        <MobileOnlyPopup mobileMaxWidth={768} />
-      )}
       
       {/* PWA Installation Prompt */}
       <PWAInstallPrompt
