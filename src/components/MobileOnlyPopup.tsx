@@ -59,7 +59,7 @@ const MobileOnlyPopup: React.FC<MobileOnlyPopupProps> = ({
             </div>
             <h2 className="text-gray-900 text-xl font-semibold mb-2">Optimized for Mobile</h2>
             <p className="text-gray-600 text-base leading-relaxed">
-              This app is designed for mobile devices. Please view on a smartphone for the best experience.
+              This app is designed for mobile devices.
             </p>
           </div>
 
