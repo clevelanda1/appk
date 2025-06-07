@@ -69,8 +69,13 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
     }
   };
   
-  // In production, uncomment this to only show on mobile
-  if (!isMobile) {
+  // Don't do mobile detection here - let the parent component control visibility
+  // if (!isMobile) {
+  //   return null;
+  // }
+
+  // Show the component if isVisible is true (controlled by parent)
+  if (!isVisible) {
     return null;
   }
 
