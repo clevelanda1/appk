@@ -238,30 +238,28 @@ const HomePage: React.FC = () => {
     // Set PWA mode state
     setIsPWAMode(isStandalone);
     
-    // Only show mobile popup if NOT in PWA mode and on initial load
-    if (!isStandalone && isInitialLoad) {
-      // Small delay to ensure page is loaded
+    // Check if the user is on a mobile device
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent || navigator.vendor
+    );
+    
+    // Show mobile popup if NOT in PWA mode and on initial load
+    if (!isStandalone && isInitialLoad && isMobileDevice) {
       const timer = setTimeout(() => {
         setShowMobilePopup(true);
       }, 500);
       return () => clearTimeout(timer);
     }
     
-    // Check if the user is on a mobile device
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent || navigator.vendor
-    );
-    
     // Show PWA prompt on every refresh if mobile and not PWA
     if (!isStandalone && isMobileDevice) {
-      // Show the prompt after a delay to allow page to load
-      const timer = setTimeout(() => {
+      const pwaTimer = setTimeout(() => {
         setIsPWAPromptVisible(true);
-      }, 1500);
+      }, 2000); // Increased delay to avoid conflicts
       
-      return () => clearTimeout(timer);
+      return () => clearTimeout(pwaTimer);
     }
-  }, []);
+  }, [isInitialLoad]);
   
   // Add this effect to ensure that the body background matches your app's background
   useEffect(() => {
@@ -523,7 +521,6 @@ const HomePage: React.FC = () => {
                 <button 
                   onClick={() => {
                     setShowFeatures(true);
-                    setIsInitialLoad(false);
                     setShowMobilePopup(false);
                   }}
                   className="text-gray-400 text-sm font-medium animate-pulse bg-white bg-opacity-5 hover:bg-opacity-10 transition-all duration-200 flex items-center px-6 py-1.5 rounded-full border border-white border-opacity-20 focus:outline-none"
