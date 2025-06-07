@@ -12,6 +12,7 @@ import {
   PatchCheck, 
   CardList 
 } from 'react-bootstrap-icons';
+import MobileOnlyPopup from './MobileOnlyPopup';
 
 const HomePage: React.FC = () => {
   const [isCardStackVisible, setIsCardStackVisible] = useState(false);
@@ -706,6 +707,9 @@ const HomePage: React.FC = () => {
         onClose={handleClosePWAPrompt}
         onDismiss={handleDismissPWAPrompt}
       />
+
+      {/* Mobile Only Popup */}
+      <MobileOnlyPopup />
     </div>
   );
 }
