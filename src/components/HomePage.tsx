@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import BankCardCycler from './BankCardCycler';
-import MobileOnlyPopup from './MobileOnlyPopup';
 import AuthCardStack from './AuthCardStack';
 import PWAInstallPrompt from './PWAInstallPrompt';
 import { 
@@ -25,8 +24,7 @@ const HomePage: React.FC = () => {
   const [isPWAPromptVisible, setIsPWAPromptVisible] = useState(false);
   const [showFeatures, setShowFeatures] = useState(false);
   const [isPWAMode, setIsPWAMode] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [showMobilePopup, setShowMobilePopup] = useState(false);
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -218,60 +216,46 @@ const HomePage: React.FC = () => {
     }
   }, [user]);
   
-  // Check if PWA prompt should be shown (on initial load)
+  // Simplified PWA detection and prompt logic
   useEffect(() => {
-    // Improved PWA detection for multiple platforms
+    console.log('PWA Detection starting...');
+    
+    // Simplified PWA detection - only check the standard methods
     const isStandalone = 
-      // Standard PWA detection
       window.matchMedia('(display-mode: standalone)').matches ||
-      // iOS Safari PWA detection
-      (window.navigator as any).standalone === true ||
-      // Android Chrome PWA detection
-      window.matchMedia('(display-mode: fullscreen)').matches ||
-      // Additional PWA indicators
-      document.referrer.includes('android-app://') ||
-      // Check if running in app context (no browser UI)
-      window.outerHeight === window.innerHeight ||
-      // User agent check for PWA
-      /Mobile/.test(navigator.userAgent) && window.screen.height === window.innerHeight;
+      (window.navigator as any).standalone === true;
+    
+    console.log('isStandalone:', isStandalone);
     
     // Set PWA mode state
     setIsPWAMode(isStandalone);
     
-    // Only show mobile popup if NOT in PWA mode and on initial load
-    if (!isStandalone && isInitialLoad) {
-      // Small delay to ensure page is loaded
-      const timer = setTimeout(() => {
-        setShowMobilePopup(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-    
     // If already installed as PWA, don't show the prompt
     if (isStandalone) {
+      console.log('App is in standalone mode, not showing PWA prompt');
       return;
     }
-    
-    const hasSeenPWAPrompt = localStorage.getItem('hasSeenPWAPrompt') === 'true';
     
     // Check if the user is on a mobile device
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent || navigator.vendor
     );
     
-    // Only show the prompt if:
-    // 1. It hasn't been dismissed before
-    // 2. User is on a mobile device
-    // 3. The app is not already installed as PWA
-    if (!hasSeenPWAPrompt && isMobileDevice && !isStandalone) {
+    console.log('isMobileDevice:', isMobileDevice);
+    
+    // Show PWA prompt on mobile devices (removed localStorage check)
+    if (isMobileDevice && !isStandalone) {
+      console.log('Scheduling PWA prompt to show in 1.5 seconds');
       // Show the prompt after a short delay to allow page to load
       const timer = setTimeout(() => {
-        console.log('Setting PWA prompt visible');
+        console.log('Setting PWA prompt visible now');
         setIsPWAPromptVisible(true);
       }, 1500);
       
       return () => clearTimeout(timer);
     }
+    
+    console.log('PWA prompt conditions not met');
   }, []);
   
   // Add this effect to ensure that the body background matches your app's background
@@ -353,8 +337,8 @@ const HomePage: React.FC = () => {
   };
   
   const handleDismissPWAPrompt = () => {
-    // Save to localStorage so the prompt doesn't show again
-    localStorage.setItem('hasSeenPWAPrompt', 'true');
+    // Optionally save to localStorage so the prompt doesn't show again
+    // localStorage.setItem('hasSeenPWAPrompt', 'true');
     setIsPWAPromptVisible(false);
   };
   
@@ -530,11 +514,7 @@ const HomePage: React.FC = () => {
               
               <div className="mt-6 flex flex-col items-center">
                 <button 
-                  onClick={() => {
-                    setShowFeatures(true);
-                    setIsInitialLoad(false);
-                    setShowMobilePopup(false);
-                  }}
+                  onClick={() => setShowFeatures(true)}
                   className="text-gray-400 text-sm font-medium animate-pulse bg-white bg-opacity-5 hover:bg-opacity-10 transition-all duration-200 flex items-center px-6 py-1.5 rounded-full border border-white border-opacity-20 focus:outline-none"
                   style={{ animationDuration: "2s" }}
                 >
@@ -719,11 +699,6 @@ const HomePage: React.FC = () => {
           background-color: #000 !important;
         }
       `}</style>
-      
-      {/* Mobile Only Popup - Clean design with lower z-index */}
-      {showMobilePopup && (
-        <MobileOnlyPopup mobileMaxWidth={768} />
-      )}
       
       {/* PWA Installation Prompt */}
       <PWAInstallPrompt
