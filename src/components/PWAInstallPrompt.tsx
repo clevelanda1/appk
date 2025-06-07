@@ -159,12 +159,16 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                 <>
                   <button
                     onClick={handleInstallClick}
-                    className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
+                    className="group relative w-full text-white py-3.5 px-4 text-base font-semibold focus:outline-none active:opacity-90 transition-all duration-200 rounded-xl overflow-hidden"
                     style={{
-                      boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
+                      background: 'linear-gradient(to right, #0A84FF, #0070E0)',
+                      boxShadow: '0 2px 8px rgba(10, 132, 255, 0.3), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.2)'
                     }}
                   >
-                    Install App
+                    <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white to-transparent opacity-10 pointer-events-none rounded-t-xl"></div>
+                    <span className="relative z-10">
+                      Install App
+                    </span>
                   </button>
                   
                   <button
@@ -194,12 +198,16 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                 <>
                   <button
                     onClick={onClose}
-                    className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
+                    className="group relative w-full text-white py-3.5 px-4 text-base font-semibold focus:outline-none active:opacity-90 transition-all duration-200 rounded-xl overflow-hidden"
                     style={{
-                      boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
+                      background: 'linear-gradient(to right, #0A84FF, #0070E0)',
+                      boxShadow: '0 2px 8px rgba(10, 132, 255, 0.3), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.2)'
                     }}
                   >
-                    Got It!
+                    <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white to-transparent opacity-10 pointer-events-none rounded-t-xl"></div>
+                    <span className="relative z-10">
+                      Got It!
+                    </span>
                   </button>
                   
                   <button
