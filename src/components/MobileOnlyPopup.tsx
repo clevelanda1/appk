@@ -66,9 +66,9 @@ const MobileOnlyPopup: React.FC<MobileOnlyPopupProps> = ({
           {/* Visual Indicator */}
           <div className="px-6 pb-6">
             <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-              <p className="text-gray-700 text-center mb-2 text-base">
+              {/*<p className="text-gray-700 text-center mb-2 text-base">
                 This application is designed for mobile devices.
-              </p>
+        </p>*/}
               <p className="text-gray-500 text-center text-sm">
                 Please view on a smartphone or resize your browser window to a mobile width for the best experience.
               </p>
