@@ -147,22 +147,38 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <button
-                onClick={handleInstallClick}
-                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
-                style={{
-                  boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
-                }}
-              >
-                {platform === 'android' && deferredPrompt ? 'Install App' : 'Got It!'}
-              </button>
-              
-              <button
-                onClick={onDismiss}
-                className="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 py-3.5 px-4 rounded-xl transition-all duration-200 font-medium focus:outline-none text-base"
-              >
-                Not Now
-              </button>
+              {platform === 'android' && deferredPrompt ? (
+                // Android with native install prompt available
+                <>
+                  <button
+                    onClick={handleInstallClick}
+                    className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
+                    style={{
+                      boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
+                    }}
+                  >
+                    Install App
+                  </button>
+                  
+                  <button
+                    onClick={onDismiss}
+                    className="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 py-3.5 px-4 rounded-xl transition-all duration-200 font-medium focus:outline-none text-base"
+                  >
+                    Not Now
+                  </button>
+                </>
+              ) : (
+                // iOS and other mobile devices - just "Got It!" button
+                <button
+                  onClick={onClose}
+                  className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
+                  style={{
+                    boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
+                  }}
+                >
+                  Got It!
+                </button>
+              )}
             </div>
           </div>
         </div>
