@@ -255,7 +255,7 @@ const HomePage: React.FC = () => {
     if (!isStandalone && isMobileDevice) {
       const pwaTimer = setTimeout(() => {
         setIsPWAPromptVisible(true);
-      }, 500); // Increased delay to avoid conflicts
+      }, 2000); // Increased delay to avoid conflicts
       
       return () => clearTimeout(pwaTimer);
     }
@@ -520,8 +520,10 @@ const HomePage: React.FC = () => {
               <div className="mt-6 flex flex-col items-center">
                 <button 
                   onClick={() => {
+                    console.log('Explore features clicked, current showFeatures:', showFeatures);
                     setShowFeatures(true);
                     setShowMobilePopup(false);
+                    console.log('Set showFeatures to true');
                   }}
                   className="text-gray-400 text-sm font-medium animate-pulse bg-white bg-opacity-5 hover:bg-opacity-10 transition-all duration-200 flex items-center px-6 py-1.5 rounded-full border border-white border-opacity-20 focus:outline-none"
                   style={{ animationDuration: "2s" }}
