@@ -105,7 +105,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         >
           {/* App Icon and Header */}
           <div className="text-center pt-8 pb-4 px-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-4xl mx-auto mb-4 flex items-center justify-center shadow-lg">
               <img 
                 src="/logo.png" 
                 alt="Logo" 
