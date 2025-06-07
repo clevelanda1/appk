@@ -106,13 +106,15 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
           {/* App Icon and Header */}
           <div className="text-center pt-8 pb-4 px-6">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg">
-              <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H11V21H5V19H11V17H5V15H11V13H5V11H11V9H5V7H5V5H13V9H21ZM15 15V13H17V11H19V13H21V15H19V17H17V15H15Z"/>
-              </svg>
+              <img 
+                src="/logo.png" 
+                alt="Logo" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
             <h2 className="text-gray-900 text-lg font-semibold mb-2">Get the Full Experience</h2>
             <p className="text-gray-600 text-sm leading-relaxed">
-            Add to your home screen for a complete & native app experience, optimized for mobile.
+              Add to your home screen for a complete & native app experience, optimized for mobile.
             </p>
           </div>
 
