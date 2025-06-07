@@ -178,7 +178,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                 // iOS devices - only "Got It!" button, no "Not Now"
                 <button
                   onClick={onClose}
-                  className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
+                  className="w-full bg-blue-400 hover:bg-blue-500 active:bg-blue-600 text-white py-3.5 px-4 rounded-xl transition-all duration-200 font-semibold focus:outline-none text-base"
                   style={{
                     boxShadow: '0 1px 3px rgba(59, 130, 246, 0.4)'
                   }}
