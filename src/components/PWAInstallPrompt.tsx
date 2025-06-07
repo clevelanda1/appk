@@ -129,7 +129,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                     </div>
                   </div>
                   <div>
-                    <p className="text-gray-900 text-sm font-medium">Tap the Share button</p>
+                    <p className="text-gray-900 text-sm font-medium">Tap the browser's Share button</p>
                     <p className="text-gray-600 text-xs">Then choose "Add to Home Screen"</p>
                   </div>
                 </div>
