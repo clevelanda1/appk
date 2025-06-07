@@ -23,6 +23,7 @@ const MobileOnlyPopup: React.FC<MobileOnlyPopupProps> = ({
   }, []);
 
   const checkScreenSize = () => {
+    // Show popup when screen is LARGER than mobile (desktop/tablet)
     setIsVisible(window.innerWidth > mobileMaxWidth);
   };
 
